@@ -2,6 +2,8 @@ library(hop)
 library(invgamma)
 library(matlib)
 library(GameTheory)
+library(lpSolve)
+library(retistruct)
 
 
 #generira matriko z razlicnimi porazdelitvai 
@@ -21,89 +23,69 @@ matrika <- function(porazdelitev, row, col){
   
 }
 
-#izhajamo iz bimatricne igre, funkcija vrne payoff vrednosti
+#Linearni program za maxmin strategijo za prvega in drugega igralca
 
-enofazna_igra <- function(G,length=1000,
-                          xtop = 1){
-  X = G # prvi igralec ima vrstice
-  Y = t(G) #drugi igralec ima stoplce
-  SQ <- c(gt_minimax(X)[[1]], gt_minimax(t(Y))[[1]])
-  Z <- matrix(c(X, Y), ncol=2)
-  Z <- t(t(Z) - SQ)
+minmax_p <- function(A, B){ 
+  org <- t(A-B)
+  
+  #original
+  vrstice <- nrow(org)
+  stolpci <- ncol(org)
+  modmat <- rbind(org, rep(1, stolpci))
+  f.con <- cbind(modmat, c(rep(1, vrstice), 0))
+  f.obj <- c(rep(0, stolpci), 1)
+  f.dir <- c(rep('<=', vrstice), '=')
+  f.rhs <- c(rep(0, vrstice), 1)
+  lin_prog <- lp ("max", f.obj, f.con, f.dir, f.rhs)
+  
+  return(lin_prog$solution)
+  
+}
+
+minmax_q <- function(A, B){
+  dual <-  B-A
+  #dual 
+  vrsticeD <- nrow(dual)
+  stolpciD <- ncol(dual)
+  modmatD <- rbind(dual, rep(1, stolpciD))
+  d.con <- cbind(modmatD, c(rep(1, vrsticeD ), 0))
+  d.obj <- c(rep(0, stolpciD), 1)
+  d.dir <- c(rep('>=', vrsticeD), '=')
+  d.rhs <- c(rep(0, vrsticeD), 1)
+  lin_prog_d <- lp ("min", d.obj, d.con, d.dir, d.rhs)
+  return(lin_prog_d$solution)
+
+}
+
+#enofazno pogajanje status quo je vedno tocka (0,0) --> TO NI PRAVA FORMULA!!
+enofazno_pogajanje <- function(A, B, length=1000,
+                               xtop = 1){
+  SQ <- c(0, 0)
+  Z <- matrix(c(A-B, t(A-B)), ncol=2)
   opt <- max(rowSums(Z))
   xtop <- opt
   f <- function(x) x
   g <- function(x) opt - x
-  xlim <-  c(SQ[1],xtop)
-  ylim <- c(SQ[2],xtop)
-  
-  x 	<-  seq(0,xtop, length = length)
-  x2 	<-  seq(0,max(xlim)*2, length = length)
-  nsh	<-  x[sapply(x, function(i) f(i)*g(i))==max(sapply(x, function(i) f(i)*g(i)))]  # NASH Bargaining Solution
-  if(length(nsh)>1) nsh <- sample(nsh,1)
-  N	  <-  g(nsh)*f(nsh)
-  
-  payoff <- c(round(g(nsh),2), round(f(nsh),2))
-  return(payoff)
+  sporazum <- line.line.intersection(c(0, f(0)), c(xtop, f(xtop)), c(0, g(0)), c(xtop, g(xtop)))
+  return(round(sporazum,3))
 }
 
 
+#dvofazno pogajanje , status quo je tocka groznje, ki jo določimo s pomočjo maxmin strategije
 
-matMax <- function(matrika)
-{
-  colmn <- which(matrika == max(matrika)) %/% nrow(matrika) + 1
-  row <- which(matrika == max(matrika)) %% nrow(matrika)
-  return( matrix(c(row, colmn), 1))
-}
-
-#dvofazna igra, zacetek v strateski, imamo 2 matriki koristnosti. Funkcija vrne payoff, obeh igralcev. gt
-
-dvofazna_igra <- function(A, B){
-  mat_igra = A-B 
-  v <- gt_minimax(mat_igra)$`Minimax payoff`  
-  q <- gt_minimax(mat_igra)$`Other's strategy`
-  p <- gt_minimax(- t(mat_igra))$`Other's strategy`
-  vsota <- A+B
-  sigma <- max(vsota)
-  payoff <- c( (sigma + v)/2 , (sigma - v)/2 )
+dvofazno_pogajanje <- function(A, B, length=1000,
+                          xtop = 1){
+  vek_q <- minmax_q(A,B)
+  q <- vek_q[1:length(vek_q)-1]
+  vek_p <- minmax_p(A,B)
+  p <- vek_p[1:length(vek_p)-1]
+  v_igre <- vek_p[length(vek_p)]
   tocka_groznje_1 <- t(p) %*% A %*% q
   tocka_groznje_2 <- t(p) %*% B %*% q
-  #indeks <- matMax(vsota)
-  #A_i_j <- A[indeks[1]][indeks[2]]
-  #P1toP2 <- A_i_j - payoff[1]
-  return(c(payoff))
-
-  
-}
-
-#funkcija ki ponovi (ponovitev)- krat igro in izracuna sporazum in povem vrne povprecje vseh ponovitev
-povprecje_enofazna <- function(ponovitev, por, n, m){
-  i <- 1
-  vec_P1 <- c()
-  vec_P2 <- c()
-  while (i <= ponovitev){
-    igra <- enofazna_igra(matrika(por, n,m))
-    print(igra)
-    vec_P1 <- append(vec_P1, igra[1])
-    vec_P2 <- append(vec_P2, igra[2])
-    i <- i+ 1
-    
-  }
-  return(c(mean(vec_P1), mean(vec_P2)))
-}
-
-povprecje_dvofazne <- function(ponovitev, por1,por2, n, m){
-  i <- 1
-  vec_P1 <- c()
-  vec_P2 <- c()
-  while (i <= ponovitev){
-    igra <- dvofazna_igra(matrika(por1, n,m), matrika(por2, n,m))
-    vec_P1 <- append(vec_P1, igra[1])
-    vec_P2 <- append(vec_P2, igra[2])
-    i <- i+ 1
-    
-  }
-  return(c(mean(vec_P1), mean(vec_P2)))
+  SQ <- c(tocka_groznje_1, tocka_groznje_2)
+  sigma <- max(A-B)
+  sporazum <- c(round(sigma + (tocka_groznje_1 -tocka_groznje_2)/2, 3) , round(sigma + ((-tocka_groznje_1+tocka_groznje_2)/2), 3))
+  return(sporazum)
 }
 
 
