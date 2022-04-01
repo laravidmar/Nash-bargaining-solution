@@ -55,7 +55,6 @@ enofazna_enaka_por <- function(por1, por2, n, m){
     i <- i +1
   }
   colnames(payoff_matrika)<- c('velikost_matrike', 'igralec', 'Vrednost')
-  #return(ggplot(data = payoff_matrika, aes(igralec1, igralec2))+ geom_line())
   return(payoff_matrika)
 }
 
@@ -63,19 +62,44 @@ enofazna_enaka_por <- function(por1, por2, n, m){
 enofazna_enaka_por_big_n <- function(por1, por2, n, m){ 
   payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-1) *(m-1), ncol = 3))
   stevec <- 1
-  for (i in 2:m){
-      izracun <- povprecje_enofazna(50, por1, por2, n, i)
-      payoff_matrika[stevec,] <- cbind(i, izracun[1], izracun[2])
+  for (i in 2:n){
+    j <-2
+    while (j <= m){
+      izracun <- povprecje_enofazna(50, por1, por2, i, j)
+      payoff_matrika[stevec,] <- cbind(i*j, izracun[1], izracun[2])
       stevec <- stevec +1
+      j <- j+1
+    }
   }
   colnames(payoff_matrika)<- c('velikost_matrike', 'igralec1', 'igralec2')
   return(payoff_matrika)
   
 }
 
+#dvofazna za velikosti matrike do 10x10 
+dvofazna_enaka_por <- function(por1, por2, n, m){ 
+  payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-1) *(m - 1)*2, ncol = 3))
+  stevec <- 1
+  i <- 2
+  while (i <= n){
+    j <-2
+    while (j <= m){
+      izracun <- povprecje_dvofazne(50, por1, por2, n, m)
+      payoff_matrika[stevec,] <- cbind(i * j,'igralec1', izracun[1])
+      payoff_matrika[stevec + 1,] <- cbind(i * j, 'igralec2', izracun[2])
+      
+      j <- j+1
+      stevec <- stevec +2
+    }
+    i <- i +1
+  }
+  colnames(payoff_matrika)<- c('velikost_matrike', 'igralec', 'Vrednost')
+  return(payoff_matrika)
+}
+
 
 #dobimo matriko v kateri so payoffi obeh igralcev vse do velikosti n *m, glede na izbrani porazdelitvi, za dvofazno igro 
-dvofazna_enaka_por <- function(por1,por2, n, m){ 
+dvofazna_enaka_por_big_n <- function(por1,por2, n, m){ 
   payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-1) *(m-1), ncol = 3))
   stevec <- 1
   for (i in 2:n){
@@ -133,6 +157,207 @@ dvofazna_vec_porazdelitev <- function(por0, por1 = 0, por2 = 0, por3= 0, por4= 0
   return(payoff_mat)
 }
 
+#branje iz RDS za vsako porazdlitev
+
+izbrana_porazdelitev <- function(por1, por2, n, m){
+  if (por1 == 'exp'){
+    if (por2 == 'exp'){
+      uvoz <- readRDS('exp_exp_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'norm'){
+      uvoz <- readRDS('exp_norm_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'beta'){
+      uvoz <- readRDS('exp_beta_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'invgama'){
+      uvoz <- readRDS('exp_invgama_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }
+  }
+  
+  else if (por1 == 'norm'){
+    if (por2 == 'exp'){
+      uvoz <- readRDS('norm_exp_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'norm'){
+      uvoz <- readRDS('norm_norm_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'beta'){
+      uvoz <- readRDS('norm_beta_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'invgama'){
+      uvoz <- readRDS('norm_invgama_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }
+  }
+  
+  else if (por1 == 'beta'){
+    if (por2 == 'exp'){
+      uvoz <- readRDS('beta_exp_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'norm'){
+      uvoz <- readRDS('beta_norm_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'beta'){
+      uvoz <- readRDS('beta_beta_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'invgama'){
+      uvoz <- readRDS('beta_invgama_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }
+  }
+  
+  else if (por1 == 'invgama'){
+    if (por2 == 'exp'){
+      uvoz <- readRDS('invgama_exp_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'norm'){
+      uvoz <- readRDS('invgama_norm_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'beta'){
+      uvoz <- readRDS('invgama_beta_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'invgama'){
+      uvoz <- readRDS('invgama_invgama_2.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }
+  }
+  return(dat)
+}
+
+#enofazna 3D graf
+
+izbrana_porazdelitev_1 <- function(por1, por2, n, m){
+  if (por1 == 'exp'){
+    if (por2 == 'exp'){
+      uvoz <- readRDS('exp_exp_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'norm'){
+      uvoz <- readRDS('exp_norm_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'beta'){
+      uvoz <- readRDS('exp_beta_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'invgama'){
+      uvoz <- readRDS('exp_invgama_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }
+  }
+  
+  else if (por1 == 'norm'){
+    if (por2 == 'exp'){
+      uvoz <- readRDS('norm_exp_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'norm'){
+      uvoz <- readRDS('norm_norm_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'beta'){
+      uvoz <- readRDS('norm_beta_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'invgama'){
+      uvoz <- readRDS('norm_invgama_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }
+  }
+  
+  else if (por1 == 'beta'){
+    if (por2 == 'exp'){
+      uvoz <- readRDS('beta_exp_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'norm'){
+      uvoz <- readRDS('beta_norm_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'beta'){
+      uvoz <- readRDS('beta_beta_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'invgama'){
+      uvoz <- readRDS('beta_invgama_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }
+  }
+  
+  else if (por1 == 'invgama'){
+    if (por2 == 'exp'){
+      uvoz <- readRDS('invgama_exp_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'norm'){
+      uvoz <- readRDS('invgama_norm_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'beta'){
+      uvoz <- readRDS('invgama_beta_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }else if (por2 == 'invgama'){
+      uvoz <- readRDS('invgama_invgama_1.RDS')
+      dat <- head(uvoz, (n-1) * (m-1))
+    }
+  }
+  return(dat)
+}
 
 
+#graf za grafično ponazoritev pogajanja 
+
+graf_enofazna <- function(por1, por2, n, m){
+  l <- matrika(por1, n,m)
+  k <- matrika(por2,n,m)
+  Z <- matrix(c(l, k), ncol=2)
+  opt <- max(l+k)
+  plot(l,k, cex = 0.5, xlim= c(min(Z[,1]-2),max(Z[,1] +2)), ylim=c(min(Z[,2])-2,max(Z[,2])+2),type="n", xlab = 'Izplacila prvega igralca'
+       , ylab = 'Izplacila drugega igralca')
+  hpts <- chull(Z)
+  hpts <- c(hpts, hpts[1])
+  lines(Z[hpts, ])
+  polygon(Z[hpts, ], col='cornsilk')
+  points(Z, col = "black", pch=19)
+  abline(0,1, col = "grey", lty = 5)
+  f <- function(x) opt - x 
+  a <- seq(-20, 20, 0.1)
+  points(0,0,col = "grey", pch=19)
+  text(0+.2, 0, "SQ", cex=1, col='grey')
+  lines(a, f(a), lwd= 1, col = 'blue')
+  nbs <- enofazno_pogajanje(l,k)
+  points(nbs[1], nbs[2], pch = 18, col = 'orange', cex = 1)
+  text(nbs[1]+.2, nbs[2], "NBS", cex=1.1, col='orange')
+  title(paste("Nashev sporazum: (",
+              round(nbs[1],2),
+              ",",
+              round(nbs[2],2),
+              ")", sep = ""
+  ))
+}
+
+graf_dvofazna <- function(por1, por2, n, m){
+  
+  #izračun status quo tocke 
+  A <- matrika(por1, n, m)
+  B <- matrika(por2, n, m)
+  vek_q <- minmax_q(A,B)
+  p <- vek_q[1:length(vek_q)-1]
+  vek_p <- minmax_p(A,B)
+  q <- vek_p[1:length(vek_p)-1]
+  tocka_groznje_1 <- t(p) %*% A %*% q
+  tocka_groznje_2 <- t(p) %*% B %*% q
+  SQ <- c(tocka_groznje_1, tocka_groznje_2)
+
+  #graf
+  Z <- matrix(c(A, B), ncol=2)
+  opt <- max(A+B)
+  plot(A,B, cex = 0.5, xlim= c(min(Z[,1]-0.5),max(Z[,1] +0.5)), ylim=c(min(Z[,2])-0.5,max(Z[,2])+0.5),type="n")
+  hpts <- chull(Z)
+  hpts <- c(hpts, hpts[1])
+  lines(Z[hpts, ])
+  polygon(Z[hpts, ], col='cornsilk')
+  points(Z, col = "black", pch=19)
+  f <- function(x) opt - x
+  h <- function(x) x - (SQ[1]-SQ[2])
+  a <- seq(-50, 50, 0.1)
+  points(SQ[1],SQ[2],col = "grey", pch=19)
+  text(SQ[1]+.09, SQ[2], "SQ", cex=1, col='grey')
+  lines(a, f(a), lwd= 1, col = 'blue')
+  lines(a, h(a))
+  nbs <- dvofazno_pogajanje(A,B)
+  points(nbs[1], nbs[2], pch = 18, col = 'orange', cex = 1)
+  text(nbs[1]+.1, nbs[2], "NBS", cex=1.1, col='orange')
+}
 

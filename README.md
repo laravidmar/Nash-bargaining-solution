@@ -18,12 +18,12 @@ Pogodba ima sledeče sestavine:
 
 * Pri prenosljivih dobrinah imamo stranska plačia. 
 
-Gledali bomo bimatrične igre, to so končne igre za dva igralca. Podana je s parom matrik (A , B), kjer je <img src="https://render.githubusercontent.com/render/math?math={A, B} \subset \mathbf{R}^{m \times n} ">. Pri tem so koristnosti prvega igralca podani kot elemani matrike A in koristnosti drugega igralca v matriki B. Igro predstavimo v matriki G, ki vseguje akcije igralcev. Koristnost prvega igralca je ravno nasprotna koristnosti drugega igralca.
+Gledali bomo bimatrične igre, to so končne igre za dva igralca. Podana je s parom matrik (A , B), kjer je <img src="https://render.githubusercontent.com/render/math?math={A, B} \subset \mathbf{R}^{m \times n} ">. Pri tem so koristnosti prvega igralca podani kot elementi matrike A in koristnosti drugega igralca v matriki B.
 
 ## Opis projekta
 
-Gledala bom bimatrične kooperativne igre. Kot prvo bom simulirala matriko akcij G, vrednosti bom vzela iz različnih porazdelitev.
+Gledala bom bimatrične kooperativne igre. Kot prvo bom simulirala matriko akcij A in B, vrednosti bom vzela iz različnih porazdelitev. Izhajala bom iz strateške igre za dva igralca. 
 
-Gledala bom samo prenosljive dobrine, kar pomeni, da je rešitev sporazum. Kot prvo bom simulirala eno fazno igro, to pomeni da bom izhajala direktno iz matrike koristnosti, status quo bo določen glede na strategijo minmax. Nato pa še dvofazno igro, kjer izhajamo iz strateške igre za dva igralca. Imeli bomo dve matriki akcij, za vsakega igralca posebaj. Pri obeh igrah bo funcija vrnila izplačila igralcev v igri. 
+Gledala bom samo prenosljive dobrine, kar pomeni, da je rešitev sporazum. Kot prvo bom simulirala enostopensko pogajanje, to pomeni da bo status quo v točki (0,0). Nato pa še dvostopensko igro, kjer bo status quo predstavljav grozilne strategija igralca. Pri obeh igrah bo funcija vrnila izplačila igralcev v igri. 
 
 Analizirala bom izplačila posameznika v igri pri različnih porazdelitvah koristnosti in glede na različno število akcij tj. velikost matrike. Celotna analiza bo predstavljena v aplikaciji. 

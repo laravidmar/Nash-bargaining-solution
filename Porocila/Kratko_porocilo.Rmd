@@ -1,0 +1,53 @@
+---
+title: "Kratko porocilo"
+output:
+  html_document:
+    df_print: paged
+date: '2022-03-24'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Opis projekta
+
+Analizirala bom Nashov model pogajanja pri prenosljivih dobrinah. Gledala bom izplačila v matrični igri za dva igralca. Rešitev je vedno sporazum. Razlikovala bom med enostopensko in dvostopensko igro. Razlika je v tem katero točko vzamemo za status quo. Pri reševanju sporazuma izhajamo iz strateške igre za dva igralca. Na začetku imamo torej dve matriki koristnosti A in B. Nashov model pogajanja pri prenosljivih dobrinah je ekvivalenten igri z mešanimi strategijami, kjer ima prvi igralec koristi v matriki A-B, drugi pa A-B transponirano. To je torej matrična igra, pri kateri matriko sestavljajo razlike A-B. 
+
+## Plan dela 
+
+### Dosedanje delo 
+
+Projekt delam v programu R. Kot prvo sem definirala enostopensko in dvostopensko igro pogajanja. Pri enostopenski sem si pomagala s funkcijo gt_nbs iz library(hop). Pri dvostopenski pa sem status quo določila s pomočjo linearne regresije. 
+Tako sem definirala funkcije minmax_p in minmax_q, ki vrneta najboljši strategiji akcij prvega in drugega igralca. 
+Funkciji enofazno_pogajanje in dvofazno_pogajanje pa vrneta vektor izplačil obeh igralcev pri sporazumu. 
+
+Odločila sem se, da bom primerjala igro pogajanja glede na 4 porazdelitve. To so 
+$$N(3, 0.7), \quad Beta(5,1), \quad Invgama(2, 0.5), \quad Exp(3).$$ Funkcija, ki generira eno od teh matrik je funkcija $matrika.$ Pri vsaki igri bomo potrebovali dve matriki, za prvega in za drugega igralca. 
+
+Težave sem imela pri funkcijah za eno in dvostopensko pogajanje, saj sem prvo uporabila že vgrajeno funkcijo gt_minmax. Le ta je vrnila najboljše strategije, vendar je delovala le za matrike do velikosti $4 x 4$. V kolikor je bila večja je potrebovala veliko časa in prostora. Kot drugo pa sem imela nekaj težavo tudi s teorijo, kako je pravilni izračun točke sporazuma. Kot ugotavljam pa mi kljub popravku funkcije maxmin še vedno vrača napačne rezultate. 
+
+### Nadaljevanje dela 
+
+Analizirala bom velikost izplačil posameznega igralca. Gledala bom različne velikosti matrik, maksimalno število akcij 40, torej matrika 40x40. Matrike bodo velike, zato bo potreba vrednosti izplačil shraniti v RDS datoteke. 
+
+Analizirala bom podatke glede na:
+
+$\star$ Prvi igralec ima neko fiksno porazdelitev. Gledala bom kako porazdelitev akcij drugega igralca vpliva na sporazum.
+
+$\star$ Kako velikost matrike vpliva na sporazum, pri fiksnih porazdelitvah matrik A in B. 
+ 
+Celotna analiza bo predstavljena v aplikaciji, kjer bodo možnosti izbire različne velikosti matrike koristnosti za posameznega igralca in njune porazdelitve. 
+
+
+
+
+
+
+
+
+
+
+
+
+

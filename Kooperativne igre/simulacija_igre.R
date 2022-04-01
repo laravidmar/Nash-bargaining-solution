@@ -26,8 +26,14 @@ matrika <- function(porazdelitev, row, col){
 #Linearni program za maxmin strategijo za prvega in drugega igralca
 
 minmax_p <- function(A, B){ 
-  org <- t(A-B)
-  
+  raz <- A-B
+  min_element <- min(raz) + 1
+  if (min_element <= 0){
+    org <- min_element + raz
+    
+  }else {
+  org <- raz
+  }
   #original
   vrstice <- nrow(org)
   stolpci <- ncol(org)
@@ -43,7 +49,13 @@ minmax_p <- function(A, B){
 }
 
 minmax_q <- function(A, B){
-  dual <-  B-A
+  raz <- t(A-B) 
+  min_element <- min(raz) + 1
+  if (min_element <= 0){
+    dual <- min_element + raz
+  }else {
+    dual <- raz
+  }
   #dual 
   vrsticeD <- nrow(dual)
   stolpciD <- ncol(dual)
@@ -58,34 +70,47 @@ minmax_q <- function(A, B){
 }
 
 #enofazno pogajanje status quo je vedno tocka (0,0) --> TO NI PRAVA FORMULA!!
-enofazno_pogajanje <- function(A, B, length=1000,
-                               xtop = 1){
+enofazno_pogajanje <- function(A, B){
   SQ <- c(0, 0)
-  Z <- matrix(c(A-B, t(A-B)), ncol=2)
-  opt <- max(rowSums(Z))
+  Z <- A-B
+  opt <- max(A+B)
+  pos <- which(A+B == opt, arr.ind = TRUE)
+  max_tocka <- c(A[pos[1],pos[2]], B[pos[1], pos[2]])
   xtop <- opt
   f <- function(x) x
   g <- function(x) opt - x
-  sporazum <- line.line.intersection(c(0, f(0)), c(xtop, f(xtop)), c(0, g(0)), c(xtop, g(xtop)))
+  sporazum <- line.line.intersection(c(0, f(0)), c(xtop, f(xtop)), max_tocka, c( 0, opt))
   return(round(sporazum,3))
 }
 
 
 #dvofazno pogajanje , status quo je tocka groznje, ki jo določimo s pomočjo maxmin strategije
 
-dvofazno_pogajanje <- function(A, B, length=1000,
-                          xtop = 1){
+dvofazno_pogajanje <- function(A, B){
   vek_q <- minmax_q(A,B)
-  q <- vek_q[1:length(vek_q)-1]
+  p <- vek_q[1:length(vek_q)-1]
   vek_p <- minmax_p(A,B)
-  p <- vek_p[1:length(vek_p)-1]
+  q <- vek_p[1:length(vek_p)-1]
   v_igre <- vek_p[length(vek_p)]
+  print(p)
+  print(q)
   tocka_groznje_1 <- t(p) %*% A %*% q
   tocka_groznje_2 <- t(p) %*% B %*% q
   SQ <- c(tocka_groznje_1, tocka_groznje_2)
-  sigma <- max(A-B)
-  sporazum <- c(round(sigma + (tocka_groznje_1 -tocka_groznje_2)/2, 3) , round(sigma + ((-tocka_groznje_1+tocka_groznje_2)/2), 3))
+  print(SQ)
+ 
+  Z <- A-B
+  opt <- max (A+B)
+  g <- function(x) opt - x
+  if (SQ[1] < SQ[2]){
+    tocka2 <- c(0, SQ[2]-SQ[1])
+  }else{
+    tocka2 <- c(SQ[1]- SQ[2], 0)
+  }
+  sporazum <- line.line.intersection(c(0, g(0)), c(opt, g(opt)), c(SQ[1], SQ[2]), tocka2)
+  print(sporazum)
   return(sporazum)
+  
 }
 
 

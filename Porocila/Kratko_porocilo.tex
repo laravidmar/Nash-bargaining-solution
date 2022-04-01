@@ -1,0 +1,130 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Kratko porocilo},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Kratko porocilo}
+\author{}
+\date{\vspace{-2.5em}2022-03-24}
+
+\begin{document}
+\maketitle
+
+\hypertarget{opis-projekta}{%
+\subsection{Opis projekta}\label{opis-projekta}}
+
+Analizirala bom Nashov model pogajanja pri prenosljivih dobrinah.
+Gledala bom izplačila v matrični igri za dva igralca. Rešitev je vedno
+sporazum. Razlikovala bom med enostopensko in dvostopensko igro. Razlika
+je v tem katero točko vzamemo za status quo. Pri reševanju sporazuma
+izhajamo iz strateške igre za dva igralca. Na začetku imamo torej dve
+matriki koristnosti A in B. Nashov model pogajanja pri prenosljivih
+dobrinah je ekvivalenten igri z mešanimi strategijami, kjer ima prvi
+igralec koristi v matriki A-B, drugi pa A-B transponirano. To je torej
+matrična igra, pri kateri matriko sestavljajo razlike A-B.
+
+\hypertarget{plan-dela}{%
+\subsection{Plan dela}\label{plan-dela}}
+
+\hypertarget{dosedanje-delo}{%
+\section{Dosedanje delo}\label{dosedanje-delo}}
+
+Projekt delam v programu R. Kot prvo sem definirala enostopensko in
+dvostopensko igro pogajanja. Pri enostopenski sem si pomagala s funkcijo
+gt\_nbs iz \(library(hop)\). Pri dvostopenski pa sem status quo določila
+s pomočjo linearne regresije. Tako sem definirala funkcije minmax\_p in
+minmax\_q, ki vrneta najboljši strategiji akcij prvega in drugega
+igralca. Funkciji enofazno\_pogajanje in dvofazno\_pogajanje pa vrneta
+vektor izplačil obeh igralcev pri sporazumu.
+
+Odločila sem se, da bom primerjala igro pogajanja glede na 4
+porazdelitve. To so
+\[N(3, 0.7), \quad Beta(5,1), \quad Invgama(2, 0.5), \quad Exp(3).\]
+Funkcija, ki generira eno od teh matrik je funkcija \(matrika.\) Pri
+vsaki igri bomo potrebovali dve različni, za prvega in za drugega
+igralca.
+
+Težave sem imela pri funkcijah za eno in dvostopensko pogajanje, saj sem
+prvo uporabila že vgrajeno funkcijo \(gt_minmax\). Le ta je prav tako
+vrgla najboljše strategije, vendar je delovala le za matrike do
+velikosti \(4 x 4\). V kolikor je bila večja je potrebovala veliko časa
+in prostora. Kot drugo pa sem imela nekaj težavo tudi s teorijo, kako je
+pravilni izračun točke sporazuma. Kot ugotavljam pa mi kljub popravku
+funkcije maxmin še vedno vrača napačne rezultate.
+
+Analizirala bom velikost izplačil posameznega igralca. Gledala bom
+različne velikosti matrik, max velikost bo 40 x 40. Matrike bodo velike,
+zato bo treba vrednosti izplačil shraniti v RDS datoteke.
+
+\hypertarget{nadaljevanje-dela}{%
+\section{Nadaljevanje dela}\label{nadaljevanje-dela}}
+
+Analiza podatkov glede na: \(\dot\) Prvi igralec ima neko fiksno
+porazdelitev in kako porazdelitev akcij drugega igralca vpliva na
+sporazum. \(\dot\) Kako velikost matrike vpliva na sporazum, pri fiksnih
+matrikah A in B.
+
+Celotna analiza bo predstavljena v aplikaciji, kjer bodo možnosti izbire
+različne velikosti matrike koristnosti za posameznega igralca in njune
+porazdelitve.
+
+\end{document}
