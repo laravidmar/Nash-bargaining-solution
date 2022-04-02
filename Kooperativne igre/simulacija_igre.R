@@ -4,6 +4,7 @@ library(matlib)
 library(GameTheory)
 library(lpSolve)
 library(retistruct)
+library(linprog)
 
 
 #generira matriko z razlicnimi porazdelitvai 
@@ -26,10 +27,10 @@ matrika <- function(porazdelitev, row, col){
 #Linearni program za maxmin strategijo za prvega in drugega igralca
 
 minmax_p <- function(A, B){ 
-  raz <- A-B
-  min_element <- min(raz) + 1
-  if (min_element <= 0){
-    org <- min_element + raz
+  raz <- -t(A-B)
+  min_element <- min(raz) 
+  if (min_element < 0){
+    org <- - min_element + raz
     
   }else {
   org <- raz
@@ -43,13 +44,13 @@ minmax_p <- function(A, B){
   f.dir <- c(rep('<=', vrstice), '=')
   f.rhs <- c(rep(0, vrstice), 1)
   lin_prog <- lp ("max", f.obj, f.con, f.dir, f.rhs)
-  
+
   return(lin_prog$solution)
   
 }
 
 minmax_q <- function(A, B){
-  raz <- t(A-B) 
+  raz <- A-B 
   min_element <- min(raz) + 1
   if (min_element <= 0){
     dual <- min_element + raz
@@ -88,16 +89,13 @@ enofazno_pogajanje <- function(A, B){
 
 dvofazno_pogajanje <- function(A, B){
   vek_q <- minmax_q(A,B)
-  p <- vek_q[1:length(vek_q)-1]
+  q <- vek_q[1:length(vek_q)-1]
   vek_p <- minmax_p(A,B)
-  q <- vek_p[1:length(vek_p)-1]
+  p <- vek_p[1:length(vek_p)-1]
   v_igre <- vek_p[length(vek_p)]
-  print(p)
-  print(q)
   tocka_groznje_1 <- t(p) %*% A %*% q
   tocka_groznje_2 <- t(p) %*% B %*% q
   SQ <- c(tocka_groznje_1, tocka_groznje_2)
-  print(SQ)
  
   Z <- A-B
   opt <- max (A+B)
@@ -108,7 +106,6 @@ dvofazno_pogajanje <- function(A, B){
     tocka2 <- c(SQ[1]- SQ[2], 0)
   }
   sporazum <- line.line.intersection(c(0, g(0)), c(opt, g(opt)), c(SQ[1], SQ[2]), tocka2)
-  print(sporazum)
   return(sporazum)
   
 }

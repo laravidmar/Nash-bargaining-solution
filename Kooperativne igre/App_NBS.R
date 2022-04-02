@@ -71,9 +71,14 @@ ui <- fluidPage(
               helpText('Če izberete več porazdelitev bodo predatvljene primerjeve.')
             ),
         mainPanel(
-          textOutput('proba'),
-          plotOutput(outputId = "plot1"),
           plotOutput(outputId = "nbs1"),
+          textOutput('nbsO'),
+          br(), 
+          br(),
+          plotOutput(outputId = "plot1"),
+          textOutput('plot1O'),
+          br(),
+          br(),
           rglwidgetOutput("dol1",  width = 800, height = 600) 
         ), position = c('left', 'right'), fluid = TRUE)
 
@@ -103,7 +108,11 @@ ui <- fluidPage(
         mainPanel(
           textOutput('vrednosti'),
           plotOutput(outputId = "plot2"),
+          br(),
+          br(),
           plotOutput(outputId = "nbs2"),
+          br(),
+          br(),
           rglwidgetOutput("plot",  width = 800, height = 600)          
         ), position = c('left', 'right'), fluid = TRUE)
       
@@ -136,24 +145,27 @@ server <- function(input, output, session){
   
   #enostopenske porazdelitev
   
-  output$proba <- renderText({
-    c(input$por1, input$n1, input$m1)
-  })
   
   
   #naredi graficno porazdelitev pogajanja 
   output$nbs1 <- renderPlot({
     graf_enofazna(input$por1, input$por11,input$n1, input$m1 )
     
+    output$nbsO <- renderText({
+      'Predstavljen je grafični prikaz sporazuma, kjer igralca začneta v statusu quo, to je točka (0,0) in potem se sporazumeta. 
+      Točka sporazuma je označena z NBS.'
+    })
   }) 
   
-  #porazdelitev za samo 2 porazdelitvi, brez primerjanja 
+  #graf 3D
   output$dol1 <- renderRglwidget({
     rgl.open(useNULL=T)
     dol <- length(input$por11)
     if (dol == 1 & ((input$n1 * input$m1) > 90)){
       dat <- izbrana_porazdelitev_1(input$por1, input$por11, input$n1, input$m1)
-      scatter3d(x=dat$igralec1, y=dat$igralec2, z=dat$velikost_matrike, surface.alpha = 0.1, fogtype = 'none', fit = 'smooth')
+      scatter3d(x=dat$igralec1, y=dat$igralec2, z=dat$velikost_matrike, surface.alpha = 0.1, fogtype = 'none', fit = 'smooth',
+                xlab = 'Izplacila prvega igralca', ylab ='Izplacila drugega igralca', zlab ='Velikost matrike (n x m)',
+                main = 'Višina izplačil glede na velikost matrike')
       rglwidget()
       
     }
@@ -175,6 +187,7 @@ server <- function(input, output, session){
         labs(x = "Velikost matrike (n x m)")+
         ggtitle("Višina izplačil glede na velikost matrike")
       
+      
     }else if (dol == 2){
       dat <- enofazna_vec_porazdelitev(por0=input$por1 ,por1 = input$por11[1], por2= input$por11[2], por3 = 0, por4 = 0, input$n1, input$m1 )
       ggplot(dat) + 
@@ -182,7 +195,8 @@ server <- function(input, output, session){
                       color = igralec, fill = igralec ), 
                   position = "dodge2", stat = "identity")+
         labs(x = 'Vrsta porazdelitve')+
-        ggtitle("Velikost izplačil posameznega igralca")
+        ggtitle("Višina izplačil posameznega igralca")+
+        theme(plot.title = element_text(size=14, face="bold"))
         
     }else if (dol == 3){
       dat <- enofazna_vec_porazdelitev(por0=input$por1 ,por1 = input$por11[1], por2= input$por11[2], por3 = input$por11[3], por4 = 0, input$n1, input$m1 )
@@ -191,7 +205,8 @@ server <- function(input, output, session){
                       color = igralec, fill = igralec ), 
                   position = "dodge2", stat = "identity")+
         labs(x = 'Vrsta porazdelitve')+
-        ggtitle("Velikost izplačil posameznega igralca")
+        ggtitle("Višina izplačil posameznega igralca")+
+        theme(plot.title = element_text(size=14, face="bold"))
     }else if (dol == 4){
       dat <- enofazna_vec_porazdelitev(por0=input$por1 ,por1 = input$por11[1], por2= input$por11[2], por3 = input$por11[3], por4 = input$por11[4], input$n1, input$m1 )
       ggplot(dat) + 
@@ -199,10 +214,13 @@ server <- function(input, output, session){
                       color = igralec, fill = igralec ), 
                   position = "dodge2", stat = "identity")+
         labs(x = 'Vrsta porazdelitve')+
-        ggtitle("Velikost izplačil posameznega igralca")
+        ggtitle("Višina izplačil posameznega igralca")+
+        theme(plot.title = element_text(size=14, face="bold"))
     }
   })
-    
+  output$plot1O <- renderText({
+    'Kot je razvidno so izplačila prvega in drugega igralca enaka, neglede na velikost matrike. Spreminja pa se velikost le teh.'
+  })
   
   #dvostopenska porazdelitev
   
@@ -211,6 +229,7 @@ server <- function(input, output, session){
     c(input$por22, input$n2, input$m2)
   }) 
   
+  #naredi graficno porazdelitev pogajanja 
   output$nbs2 <- renderPlot({
     graf_dvofazna(input$por12, input$por22,input$n2, input$m2 )
     
@@ -222,7 +241,9 @@ server <- function(input, output, session){
     dol <- length(input$por22)
     if (dol == 1 & ((input$n2 * input$m2) > 90)){
       dat <- izbrana_porazdelitev(input$por12, input$por22, input$n2, input$m2)
-      scatter3d(x=dat$igralec1, y=dat$igralec2, z=dat$velikost_matrike, surface.alpha = 0.1, fogtype = 'none', fit = 'smooth')
+      scatter3d(x=dat$igralec1, y=dat$igralec2, z=dat$velikost_matrike, surface.alpha = 0.1, fogtype = 'none', fit = 'smooth',
+                xlab = 'Izplacila prvega igralca', ylab ='Izplacila drugega igralca', zlab ='Velikost matrike (n x m)', 
+                main = 'Višina izplačil glede na velikost matrike')
       rglwidget()
       
     }
@@ -240,21 +261,24 @@ server <- function(input, output, session){
                      stat = "identity")+
           
           labs(x = "Velikost matrike (n x m)")+
-          ggtitle("Višina izplačil glede na velikost matrike")
+          ggtitle("Višina izplačil glede na velikost matrike")+
+          theme(plot.title = element_text(size=14, face="bold"))
       }else if (dol == 2){
         dat <- dvofazna_vec_porazdelitev(por0=input$por12 ,por1 = input$por22[1], por2= input$por22[2], por3 = 0, por4 = 0, input$n2, input$m2 )
         ggplot(dat) + 
           geom_bar( aes(x = Porazdelitve, y = vrednosti, 
                         color = igralec, fill = igralec ), 
                     position = "dodge2", stat = "identity")+
-          ggtitle("Velikost izplačil posameznega igralca")
+          ggtitle("Velikost izplačil posameznega igralca")+
+          theme(plot.title = element_text(size=14, face="bold"))
       }else if (dol == 3){
         dat <- dvofazna_vec_porazdelitev(por0=input$por12 ,por1 = input$por22[1], por2= input$por22[2], por3 = input$por22[3], por4 = 0, input$n2, input$m2 )
         ggplot(dat) + 
           geom_bar( aes(x = Porazdelitve, y = vrednosti, 
                         color = igralec, fill = igralec ), 
                     position = "dodge2", stat = "identity")+
-          ggtitle("Velikost izplačil posameznega igralca")
+          ggtitle("Velikost izplačil posameznega igralca")+
+          theme(plot.title = element_text(size=14, face="bold"))
       }else if (dol == 4){
         dat <- dvofazna_vec_porazdelitev(por0=input$por12 ,por1 = input$por22[1], por2= input$por22[2], por3 = input$por22[3], por4 = input$por22[4], input$n2, input$m2 )
         ggplot(dat) + 
@@ -262,7 +286,8 @@ server <- function(input, output, session){
                         color = igralec, fill = igralec ), 
                     position = "dodge2", stat = "identity")+
           ylab('Vrsta porazdelitve')+
-          ggtitle("Velikost izplačil posameznega igralca")
+          ggtitle("Velikost izplačil posameznega igralca")+
+          theme(plot.title = element_text(size=14, face="bold"))
       }
     
     })

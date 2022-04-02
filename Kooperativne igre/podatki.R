@@ -31,8 +31,8 @@ B <- matrix(c(0,-1,2,6,2,5),2,3)
 A<- matrix(c(6,7,1,5),2,2)
 B <- matrix(c(2,4,1,3),2,2)
 
-A <- matrika('beta', 7,3)
-B <- matrika('invgama', 7,3)
+A <- matrika('exp', 7,4)
+B <- matrika('exp', 7,4)
 
 r <- dvofazna_vec_porazdelitev(por0 = 'exp', por1 = 'norm',por2 = 'exp', por3 = 'invgama', por4 = 0, 5,5)
 enofazno_pogajanje(matrika('norm', 7,9), matrika('beta', 7,9))
