@@ -67,8 +67,6 @@ ui <- fluidPage(
                                  choices = list("N(3, 0.7)" = 'norm', "Beta(5,1)" = 'beta',
                                                 "Invgama(2, 0.5)" = 'invgama', "Exp(3)" = 'exp'),
                                  selected = 1),
-              helpText('Če izberete eno porazdelitev bo predatvlejno .... .'),
-              helpText('Če izberete več porazdelitev bodo predatvljene primerjeve.')
             ),
         mainPanel(
           plotOutput(outputId = "nbs1"),
@@ -79,7 +77,8 @@ ui <- fluidPage(
           textOutput('plot1O'),
           br(),
           br(),
-          rglwidgetOutput("dol1",  width = 800, height = 600) 
+          rglwidgetOutput("dol1",  width = 800, height = 600),
+          textOutput('rgl1')
         ), position = c('left', 'right'), fluid = TRUE)
 
     
@@ -106,8 +105,8 @@ ui <- fluidPage(
                              selected = 1)
         ),
         mainPanel(
-          textOutput('vrednosti'),
           plotOutput(outputId = "plot2"),
+          textOutput('nbs11'),
           br(),
           br(),
           plotOutput(outputId = "nbs2"),
@@ -130,7 +129,7 @@ server <- function(input, output, session){
   observeEvent(input$DIP, {
     updateTabsetPanel(session = session, inputId = "tabs", selected = "Dvostopenska igra")
   })
-  #vrendosti 
+  #vrednosti 
   
   output$value <- renderPrint({ input$n1 }) #vrednost za n
   output$value <- renderPrint({ input$m1 }) #vrednost za m
@@ -169,6 +168,11 @@ server <- function(input, output, session){
       rglwidget()
       
     }
+    
+  })
+  
+  output$rgl1 <- renderText({
+    'neki neki '
   })
     
 
@@ -216,22 +220,29 @@ server <- function(input, output, session){
         labs(x = 'Vrsta porazdelitve')+
         ggtitle("Višina izplačil posameznega igralca")+
         theme(plot.title = element_text(size=14, face="bold"))
+      
     }
   })
   output$plot1O <- renderText({
-    'Kot je razvidno so izplačila prvega in drugega igralca enaka, neglede na velikost matrike. Spreminja pa se velikost le teh.'
+    'Kot je razvidno so izplačila prvega in drugega igralca enaka, neglede na velikost matrike. Spreminja pa se velikost le teh. Lahko bi rekli, da velikost
+    matrike, to je število akcij, ne vpliva na velikost izplačil.'
   })
+  
+  
   
   #dvostopenska porazdelitev
   
   
-  output$vrednosti <- renderText({
-    c(input$por22, input$n2, input$m2)
+  output$nbs11 <- renderText({
+    'Predstavljen je grafični prikaz sporazuma, kjer igralca začneta v statusu quo, to je točka grožnje, ki jo dobimo s pomočjo maxmin strategije posameznega igralca. 
+      Točka sporazuma je označena z NBS.'
   }) 
+  
   
   #naredi graficno porazdelitev pogajanja 
   output$nbs2 <- renderPlot({
     graf_dvofazna(input$por12, input$por22,input$n2, input$m2 )
+    
     
   }) 
   

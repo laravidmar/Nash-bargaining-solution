@@ -3,6 +3,7 @@
 \PassOptionsToPackage{hyphens}{url}
 %
 \documentclass[
+  12pt,
 ]{article}
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -57,14 +58,14 @@
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\setcounter{secnumdepth}{5}
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 
 \title{Kratko porocilo}
 \author{}
-\date{\vspace{-2.5em}2022-03-24}
+\date{\vspace{-2.5em}}
 
 \begin{document}
 \maketitle
@@ -86,12 +87,12 @@ matrična igra, pri kateri matriko sestavljajo razlike A-B.
 \subsection{Plan dela}\label{plan-dela}}
 
 \hypertarget{dosedanje-delo}{%
-\section{Dosedanje delo}\label{dosedanje-delo}}
+\subsubsection{Dosedanje delo}\label{dosedanje-delo}}
 
 Projekt delam v programu R. Kot prvo sem definirala enostopensko in
 dvostopensko igro pogajanja. Pri enostopenski sem si pomagala s funkcijo
-gt\_nbs iz \(library(hop)\). Pri dvostopenski pa sem status quo določila
-s pomočjo linearne regresije. Tako sem definirala funkcije minmax\_p in
+gt\_nbs iz library(hop). Pri dvostopenski pa sem status quo določila s
+pomočjo linearne regresije. Tako sem definirala funkcije minmax\_p in
 minmax\_q, ki vrneta najboljši strategiji akcij prvega in drugega
 igralca. Funkciji enofazno\_pogajanje in dvofazno\_pogajanje pa vrneta
 vektor izplačil obeh igralcev pri sporazumu.
@@ -100,31 +101,39 @@ Odločila sem se, da bom primerjala igro pogajanja glede na 4
 porazdelitve. To so
 \[N(3, 0.7), \quad Beta(5,1), \quad Invgama(2, 0.5), \quad Exp(3).\]
 Funkcija, ki generira eno od teh matrik je funkcija \(matrika.\) Pri
-vsaki igri bomo potrebovali dve različni, za prvega in za drugega
+vsaki igri bomo potrebovali dve matriki, za prvega in za drugega
 igralca.
 
 Težave sem imela pri funkcijah za eno in dvostopensko pogajanje, saj sem
-prvo uporabila že vgrajeno funkcijo \(gt_minmax\). Le ta je prav tako
-vrgla najboljše strategije, vendar je delovala le za matrike do
-velikosti \(4 x 4\). V kolikor je bila večja je potrebovala veliko časa
-in prostora. Kot drugo pa sem imela nekaj težavo tudi s teorijo, kako je
+prvo uporabila že vgrajeno funkcijo gt\_minmax. Le ta je vrnila
+najboljše strategije, vendar je delovala le za matrike do velikosti
+\(4 x 4\). V kolikor je bila večja je potrebovala veliko časa in
+prostora. Kot drugo pa sem imela nekaj težavo tudi s teorijo, kako je
 pravilni izračun točke sporazuma. Kot ugotavljam pa mi kljub popravku
-funkcije maxmin še vedno vrača napačne rezultate.
-
-Analizirala bom velikost izplačil posameznega igralca. Gledala bom
-različne velikosti matrik, max velikost bo 40 x 40. Matrike bodo velike,
-zato bo treba vrednosti izplačil shraniti v RDS datoteke.
+funkcije maxmin še vedno vrača napačne rezultate. Pri večino matrik vrne
+vektor samih ničel.
 
 \hypertarget{nadaljevanje-dela}{%
-\section{Nadaljevanje dela}\label{nadaljevanje-dela}}
+\subsubsection{Nadaljevanje dela}\label{nadaljevanje-dela}}
 
-Analiza podatkov glede na: \(\dot\) Prvi igralec ima neko fiksno
-porazdelitev in kako porazdelitev akcij drugega igralca vpliva na
-sporazum. \(\dot\) Kako velikost matrike vpliva na sporazum, pri fiksnih
-matrikah A in B.
+Analizirala bom velikost izplačil posameznega igralca. Gledala bom
+različne velikosti matrik, maksimalno število akcij 40, torej matrika
+40x40. Matrike bodo velike, zato bo potrebno vrednosti izplačil shraniti
+v RDS datoteke.
+
+Pri fiksni porazdelitvi prvega igralca bom gledala kako porazdelitev
+akcij drugega igralca vpliva na sporazum. Ter kako velikost matrike
+vpliva na sporazum, če vzamemo neki fiksni matriki A in B z različnimi
+porazdelitvami.
 
 Celotna analiza bo predstavljena v aplikaciji, kjer bodo možnosti izbire
 različne velikosti matrike koristnosti za posameznega igralca in njune
-porazdelitve.
+porazdelitve. Enostopenska in dvostopenska igra bosta predstavljeni
+posebaj. Pri obeh bo graf, kjer bo prikazana implementacija sporazuma
+(sekanje dveh premic in katera točka predstavlja sporazum). Potem bo 3D
+graf, kjer bo razvidno kako se vrednosti spreminjajo glede na število
+akcij igralcev. In še histogram, kjer bo glede na neko izbrano
+porazdelitev prvega igralca, razvidno kako se izplačila spreminjajo
+glede na različne porazdelitve drugega igralca.
 
 \end{document}
