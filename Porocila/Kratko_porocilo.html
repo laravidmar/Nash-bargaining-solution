@@ -10,7 +10,6 @@
 
 
 
-<meta name="date" content="2022-03-24" />
 
 <title>Kratko porocilo</title>
 
@@ -1634,7 +1633,6 @@ pre code {
 
 
 <h1 class="title toc-ignore">Kratko porocilo</h1>
-<h4 class="date">2022-03-24</h4>
 
 </div>
 
@@ -1657,40 +1655,45 @@ matrična igra, pri kateri matriko sestavljajo razlike A-B.</p>
 <h3>Dosedanje delo</h3>
 <p>Projekt delam v programu R. Kot prvo sem definirala enostopensko in
 dvostopensko igro pogajanja. Pri enostopenski sem si pomagala s funkcijo
-gt_nbs iz <span class="math inline">\(library(hop)\)</span>. Pri
-dvostopenski pa sem status quo določila s pomočjo linearne regresije.
-Tako sem definirala funkcije minmax_p in minmax_q, ki vrneta najboljši
-strategiji akcij prvega in drugega igralca. Funkciji enofazno_pogajanje
-in dvofazno_pogajanje pa vrneta vektor izplačil obeh igralcev pri
-sporazumu.</p>
+gt_nbs iz library(hop). Pri dvostopenski pa sem status quo določila s
+pomočjo linearne regresije. Tako sem definirala funkcije minmax_p in
+minmax_q, ki vrneta najboljši strategiji akcij prvega in drugega
+igralca. Funkciji enofazno_pogajanje in dvofazno_pogajanje pa vrneta
+vektor izplačil obeh igralcev pri sporazumu.</p>
 <p>Odločila sem se, da bom primerjala igro pogajanja glede na 4
 porazdelitve. To so <span class="math display">\[N(3, 0.7), \quad
 Beta(5,1), \quad Invgama(2, 0.5), \quad Exp(3).\]</span> Funkcija, ki
 generira eno od teh matrik je funkcija <span class="math inline">\(matrika.\)</span> Pri vsaki igri bomo potrebovali
 dve matriki, za prvega in za drugega igralca.</p>
 <p>Težave sem imela pri funkcijah za eno in dvostopensko pogajanje, saj
-sem prvo uporabila že vgrajeno funkcijo <span class="math inline">\(gt_minmax\)</span>. Le ta je vrnila najboljše
-strategije, vendar je delovala le za matrike do velikosti <span class="math inline">\(4 x 4\)</span>. V kolikor je bila večja je
+sem prvo uporabila že vgrajeno funkcijo gt_minmax. Le ta je vrnila
+najboljše strategije, vendar je delovala le za matrike do velikosti
+<span class="math inline">\(4 x 4\)</span>. V kolikor je bila večja je
 potrebovala veliko časa in prostora. Kot drugo pa sem imela nekaj težavo
 tudi s teorijo, kako je pravilni izračun točke sporazuma. Kot ugotavljam
-pa mi kljub popravku funkcije maxmin še vedno vrača napačne
-rezultate.</p>
+pa mi kljub popravku funkcije maxmin še vedno vrača napačne rezultate.
+Pri večino matrik vrne vektor samih ničel.</p>
 </div>
 <div id="nadaljevanje-dela" class="section level3">
 <h3>Nadaljevanje dela</h3>
 <p>Analizirala bom velikost izplačil posameznega igralca. Gledala bom
 različne velikosti matrik, maksimalno število akcij 40, torej matrika
-40x40. Matrike bodo velike, zato bo potreba vrednosti izplačil shraniti
+40x40. Matrike bodo velike, zato bo potrebno vrednosti izplačil shraniti
 v RDS datoteke.</p>
-<p>Analizirala bom podatke glede na:</p>
-<p><span class="math inline">\(\star\)</span> Prvi igralec ima neko
-fiksno porazdelitev. Gledala bom kako porazdelitev akcij drugega igralca
-vpliva na sporazum.</p>
-<p><span class="math inline">\(\star\)</span> Kako velikost matrike
-vpliva na sporazum, pri fiksnih porazdelitvah matrik A in B.</p>
+<p>Pri fiksni porazdelitvi prvega igralca bom gledala kako porazdelitev
+akcij drugega igralca vpliva na sporazum. Ter kako velikost matrike
+vpliva na sporazum, če vzamemo neki fiksni matriki A in B z različnimi
+porazdelitvami.</p>
 <p>Celotna analiza bo predstavljena v aplikaciji, kjer bodo možnosti
 izbire različne velikosti matrike koristnosti za posameznega igralca in
-njune porazdelitve.</p>
+njune porazdelitve. Enostopenska in dvostopenska igra bosta
+predstavljeni posebaj. Pri obeh bo graf, kjer bo prikazana
+implementacija sporazuma (sekanje dveh premic in katera točka
+predstavlja sporazum). Potem bo 3D graf, kjer bo razvidno kako se
+vrednosti spreminjajo glede na število akcij igralcev. In še histogram,
+kjer bo glede na neko izbrano porazdelitev prvega igralca, razvidno kako
+se izplačila spreminjajo glede na različne porazdelitve drugega
+igralca.</p>
 </div>
 </div>
 
