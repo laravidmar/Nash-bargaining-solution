@@ -22,24 +22,25 @@ ui <- fluidPage(
           p('V teoriji iger je kooperativna igra oziroma Nashava igra pogajanja, igra pri kateri skupine igralcev med seboj tekmuje.
       Pri tem si igraleci želijo maksimizirati svojo koristnost. Igralci med seboj lahko 
         delujejo usklajeno in morda izmenjajo koristnosti. Tako pride do sporazuma.'),
-          p('V aplikaciji so predstavljene bimatricne igre, to so igre z dvemi igralci. Omejili pa smo se samo na prenosljive dobrine.
+          p('V aplikaciji so predstavljene bimatrične igre, to so igre z dvema igralcema. Omejili smo se na prenosljive dobrine.
             To so dobrine, kjer so koristi igralcev med seboj neposredno primerljive in posledično lahko to
             koristnost igralci med seboj smiselno prenašajo.'),
           br(),
           h3('Izberite željeno igro'),
           actionButton(inputId = "EIP", label = "ENOSTOPENSKA IGRA POGAJANJA"),
           br(),
-          em('Izhajamo iz strateške igre za 2 igralca. Pri tem izhajamo iz točke (0,0), to je tudi status quo.'),
+          em('Izhajamo iz strateške igre za 2 igralca. Pogajanje pričnemo iz točke (0,0), to je tudi status quo.'),
           br(),
           br(),
           actionButton(inputId = "DIP", label = "DVOSTOPENSKA IGRA POGAJANJA"),
           br(),
-          em('Izhajamo iz strateške igre za 2 igralca. Prvo igralca izhajata iz točke (0,0), potem pa uporabita svoje grozilni strategiji. Status quo 
+          em('Izhajamo iz strateške igre za 2 igralca. Prvo igralca pričneta v točki (0,0), potem pa uporabita svoje grozilni strategiji. Status quo 
              je pri tej igri ravno grozilna strategija posameznega igralca.'),
           br(),
           br(),
           br(),
-          tags$img(src = "business-finance.png", height = 300, width = 350)
+          tags$img(src = "business-finance.png", height = 300, width = 350),
+          helpText('Vir: https://www.vectorstock.com/royalty-free-vector/cartoon-business-finance-money-set-scales-stack-vector-21925200')
           
         )
       ),
@@ -77,8 +78,7 @@ ui <- fluidPage(
           textOutput('plot1O'),
           br(),
           br(),
-          rglwidgetOutput("dol1",  width = 800, height = 600),
-          textOutput('rgl1')
+          rglwidgetOutput("dol1",  width = 800, height = 600)
         ), position = c('left', 'right'), fluid = TRUE)
 
     
@@ -105,14 +105,15 @@ ui <- fluidPage(
                              selected = 1)
         ),
         mainPanel(
-          plotOutput(outputId = "plot2"),
+          plotOutput(outputId = "nbs2"),
           textOutput('nbs11'),
           br(),
           br(),
-          plotOutput(outputId = "nbs2"),
+          plotOutput(outputId = "plot2"),
+          textOutput('plot22'),
           br(),
           br(),
-          rglwidgetOutput("plot",  width = 800, height = 600)          
+          rglwidgetOutput("plot",  width = 800, height = 600)
         ), position = c('left', 'right'), fluid = TRUE)
       
 
@@ -151,7 +152,7 @@ server <- function(input, output, session){
     graf_enofazna(input$por1, input$por11,input$n1, input$m1 )
     
     output$nbsO <- renderText({
-      'Predstavljen je grafični prikaz sporazuma, kjer igralca začneta v statusu quo, to je točka (0,0) in potem se sporazumeta. 
+      'Predstavljen je grafični prikaz sporazuma, kjer igralca začneta v statusu quo (točka SQ), to je točka (0,0) in potem se sporazumeta. 
       Točka sporazuma je označena z NBS.'
     })
   }) 
@@ -163,18 +164,14 @@ server <- function(input, output, session){
     if (dol == 1 & ((input$n1 * input$m1) > 90)){
       dat <- izbrana_porazdelitev_1(input$por1, input$por11, input$n1, input$m1)
       scatter3d(x=dat$igralec1, y=dat$igralec2, z=dat$velikost_matrike, surface.alpha = 0.1, fogtype = 'none', fit = 'smooth',
-                xlab = 'Izplacila prvega igralca', ylab ='Izplacila drugega igralca', zlab ='Velikost matrike (n x m)',
-                main = 'Višina izplačil glede na velikost matrike')
+                xlab = 'Izplacila prvega igralca', ylab ='Izplacila drugega igralca', zlab ='Velikost matrike (n x m)')
       rglwidget()
       
     }
     
   })
   
-  output$rgl1 <- renderText({
-    'neki neki '
-  })
-    
+ 
 
     
   #primerjanje glede na razlicne porazdelitve 2 ali vec 
@@ -224,25 +221,32 @@ server <- function(input, output, session){
     }
   })
   output$plot1O <- renderText({
-    'Kot je razvidno so izplačila prvega in drugega igralca enaka, neglede na velikost matrike. Spreminja pa se velikost le teh. Lahko bi rekli, da velikost
-    matrike, to je število akcij, ne vpliva na velikost izplačil.'
+    dol <- length(input$por11)
+    if (dol == 1 & ((input$n1 * input$m1) <= 90)){
+      'Kot je razvidno so izplačila prvega in drugega igralca enaka, neglede na velikost matrike. Spreminja pa se velikost le teh. Lahko bi rekli, da velikost
+      matrike ne vpliva na višino izplačila.'
+    }else if(dol == 1 & ((input$n1 * input$m1) > 90)){
+      'Za večje matrike so izplačila predstavljena v 3D grafu. Vrednosti se z večanjem število akcij povečujejo. Pri nekaterih porazdelitvah se to zgodi hitreje. '
+      
+    }else if (dol >= 2){
+      paste('Prikazana so izplačila, kjer ima prvi igralec porazdelitev', input$por1, '. Porazdelitev drugega pa se spreminja. Opazimo lahko, da so razlike pri vrednostih glede na porazdelitev, kar je pričakovano.')
+    }
+    
   })
   
   
   
   #dvostopenska porazdelitev
   
-  
-  output$nbs11 <- renderText({
-    'Predstavljen je grafični prikaz sporazuma, kjer igralca začneta v statusu quo, to je točka grožnje, ki jo dobimo s pomočjo maxmin strategije posameznega igralca. 
-      Točka sporazuma je označena z NBS.'
-  }) 
-  
-  
   #naredi graficno porazdelitev pogajanja 
   output$nbs2 <- renderPlot({
     graf_dvofazna(input$por12, input$por22,input$n2, input$m2 )
     
+    
+    output$nbs11 <- renderText({
+      'Predstavljen je grafični prikaz sporazuma, kjer igralca začneta v statusu quo (točka SQ), to je točka grožnje, ki jo dobimo s pomočjo maxmin strategije posameznega igralca. 
+      Točka sporazuma je označena z NBS.'
+    }) 
     
   }) 
   
@@ -296,11 +300,23 @@ server <- function(input, output, session){
           geom_bar( aes(x = Porazdelitve, y = vrednosti, 
                         color = igralec, fill = igralec ), 
                     position = "dodge2", stat = "identity")+
-          ylab('Vrsta porazdelitve')+
           ggtitle("Velikost izplačil posameznega igralca")+
           theme(plot.title = element_text(size=14, face="bold"))
       }
     
+    })
+    output$plot22 <- renderText({
+      dol <- length(input$por22)
+      if (dol == 1 & ((input$n2 * input$m2) <= 90)){
+        'V tabeli so predstavljene vrednosti izplačil posameznega igralca glede na velikost matrike. Kot je razvidno so izplačila različna glede na 
+        igralca. Težko pa bi rekli, da vidimo kakšen vzorec.'
+      }else if(dol == 1 & ((input$n2 * input$m2) > 90)){
+        'Za večje matrike so izplačila predstavljena v 3D grafu. Vrednosti so razpršene, vendar lahko vidimo naraščujoč trend.'
+        
+      }else if (dol >= 2){
+        paste('Prikazana so izplačila, kjer ima prvi igralec porazdelitev', input$por12, '. Porazdelitev drugega pa se spreminja. Opazimo lahko, da so razlike pri vrednostih glede na porazdelitev, kar je pričakovano.')
+      }
+      
     })
     
   

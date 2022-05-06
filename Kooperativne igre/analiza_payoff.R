@@ -19,7 +19,7 @@ povprecje_enofazna <- function(ponovitev, por1, por2, n, m){
     i <- i+ 1
     
   }
-  return(c(mean(vec_P1), mean(vec_P2)))
+  return(c(round(mean(vec_P1),3),round(mean(vec_P2),3)))
 }
 
 povprecje_dvofazne <- function(ponovitev, por1,por2, n, m){
@@ -33,7 +33,7 @@ povprecje_dvofazne <- function(ponovitev, por1,por2, n, m){
     i <- i+ 1
     
   }
-  return(c(mean(vec_P1), mean(vec_P2)))
+  return(round(c(mean(vec_P1),3), round(mean(vec_P2),3)))
 }
 
 
@@ -84,7 +84,7 @@ dvofazna_enaka_por <- function(por1, por2, n, m){
   while (i <= n){
     j <-2
     while (j <= m){
-      izracun <-  dvofazno_pogajanje(matrika(por1, n,m), matrika(por2, n,m))
+      izracun <-  dvofazno_pogajanje(matrika(por1, n,m), matrika(por2, n, m))
       payoff_matrika[stevec,] <- cbind(i * j,'igralec1', izracun[1])
       payoff_matrika[stevec + 1,] <- cbind(i * j, 'igralec2', izracun[2])
       
@@ -105,7 +105,7 @@ dvofazna_enaka_por_big_n <- function(por1,por2, n, m){
   for (i in 3:n){
     j <-3
     while (j <= m){
-      izracun <- povprecje_dvofazne(50, por1, por2, i, j)
+      izracun <- povprecje_dvofazne(50, por1, por2, n, m)
       payoff_matrika[stevec,] <- cbind(i * j, izracun[1], izracun[2])
       j <- j+1
       stevec <- stevec +1
@@ -157,7 +157,9 @@ dvofazna_vec_porazdelitev <- function(por0, por1 = 0, por2 = 0, por3= 0, por4= 0
   return(payoff_mat)
 }
 
-#branje iz RDS za vsako porazdlitev
+#branje iz RDS za vsako porazdlitev posebaj
+
+##za dvofazno pogajanje
 
 izbrana_porazdelitev <- function(por1, por2, n, m){
   if (por1 == 'exp'){
@@ -226,7 +228,7 @@ izbrana_porazdelitev <- function(por1, por2, n, m){
   return(dat)
 }
 
-#enofazna 3D graf
+##za enofazno pogajanje
 
 izbrana_porazdelitev_1 <- function(por1, por2, n, m){
   if (por1 == 'exp'){
@@ -297,6 +299,7 @@ izbrana_porazdelitev_1 <- function(por1, por2, n, m){
 
 
 #graf za grafično ponazoritev pogajanja 
+##enofazna 3D graf
 
 graf_enofazna <- function(por1, por2, n, m){
   l <- matrika(por1, n,m)
@@ -327,23 +330,26 @@ graf_enofazna <- function(por1, por2, n, m){
   ))
 }
 
+##dvofazna 3D graf
 graf_dvofazna <- function(por1, por2, n, m){
   
   #izračun status quo tocke 
   A <- matrika(por1, n, m)
   B <- matrika(por2, n, m)
   vek_q <- minmax_q(A,B)
-  q <- vek_q[1:length(vek_q)-1]
+  q <- vek_q[1:(length(vek_q)-2)]
   vek_p <- minmax_p(A,B)
-  p <- vek_p[1:length(vek_p)-1]
+  p <- vek_p[1:(length(vek_p)-2)]
   tocka_groznje_1 <- t(p) %*% A %*% q
   tocka_groznje_2 <- t(p) %*% B %*% q
   SQ <- c(tocka_groznje_1, tocka_groznje_2)
 
   #graf
+  nbs <- dvofazno_pogajanje(A,B)
   Z <- matrix(c(A, B), ncol=2)
   opt <- max(A+B)
-  plot(A,B, cex = 0.5, xlim= c(min(Z[,1]-0.5),max(Z[,1] +0.5)), ylim=c(min(Z[,2])-0.5,max(Z[,2])+0.5),type="n")
+  plot(A,B, cex = 0.5, xlim= c(min(Z[,1]-0.5),nbs[1]+1), ylim=c(min(Z[,2])-0.5,nbs[2] +1),type="n", xlab = 'Izplacila prvega igralca'
+       , ylab = 'Izplacila drugega igralca')
   hpts <- chull(Z)
   hpts <- c(hpts, hpts[1])
   lines(Z[hpts, ])
@@ -356,8 +362,14 @@ graf_dvofazna <- function(por1, por2, n, m){
   text(SQ[1]+.09, SQ[2], "SQ", cex=1, col='grey')
   lines(a, f(a), lwd= 1, col = 'blue')
   lines(a, h(a))
-  nbs <- dvofazno_pogajanje(A,B)
+
   points(nbs[1], nbs[2], pch = 18, col = 'orange', cex = 1)
   text(nbs[1]+.1, nbs[2], "NBS", cex=1.1, col='orange')
+  title(paste("Nashev sporazum: (",
+              round(nbs[1],2),
+              ",",
+              round(nbs[2],2),
+              ")", sep = ""
+  ))
 }
 

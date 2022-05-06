@@ -24,6 +24,6 @@ Gledali bomo bimatrične igre, to so končne igre za dva igralca. Podana je s pa
 
 Gledala bom bimatrične kooperativne igre. Kot prvo bom simulirala matriko akcij A in B, vrednosti bom vzela iz različnih porazdelitev. Izhajala bom iz strateške igre za dva igralca. 
 
-Gledala bom samo prenosljive dobrine, kar pomeni, da je rešitev sporazum. Kot prvo bom simulirala enostopensko pogajanje, to pomeni da bo status quo v točki (0,0). Nato pa še dvostopensko igro, kjer bo status quo predstavljav grozilne strategija igralca. Pri obeh igrah bo funcija vrnila izplačila igralcev v igri. 
+Gledala bom samo prenosljive dobrine, kar pomeni, da je rešitev sporazum. Kot prvo bom simulirala enostopensko pogajanje, to pomeni da bo status quo v točki (0,0). Nato pa še dvostopensko igro, kjer bo status quo predstavljal grozilne strategija igralca. Pri obeh igrah bo funcija vrnila izplačila igralcev v igri. 
 
 Analizirala bom izplačila posameznika v igri pri različnih porazdelitvah koristnosti in glede na različno število akcij tj. velikost matrike. Celotna analiza bo predstavljena v aplikaciji. 

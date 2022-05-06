@@ -27,21 +27,14 @@ matrika <- function(porazdelitev, row, col){
 #Linearni program za maxmin strategijo za prvega in drugega igralca
 
 minmax_p <- function(A, B){ 
-  raz <- -t(A-B)
-  min_element <- min(raz) 
-  if (min_element < 0){
-    org <- - min_element + raz
-    
-  }else {
-  org <- raz
-  }
+  org <- -t(A-B)
   #original
   vrstice <- nrow(org)
   stolpci <- ncol(org)
   modmat <- rbind(org, rep(1, stolpci))
-  f.con <- cbind(modmat, c(rep(1, vrstice), 0))
-  f.obj <- c(rep(0, stolpci), 1)
-  f.dir <- c(rep('<=', vrstice), '=')
+  f.con <- cbind(modmat, c(rep(1, vrstice), 0), c(rep(-1, vrstice), 0))
+  f.obj <- c(rep(0, stolpci), 1, -1)
+  f.dir <- c(rep("<=", vrstice), "=")
   f.rhs <- c(rep(0, vrstice), 1)
   lin_prog <- lp ("max", f.obj, f.con, f.dir, f.rhs)
 
@@ -50,19 +43,13 @@ minmax_p <- function(A, B){
 }
 
 minmax_q <- function(A, B){
-  raz <- A-B 
-  min_element <- min(raz) + 1
-  if (min_element <= 0){
-    dual <- min_element + raz
-  }else {
-    dual <- raz
-  }
+  dual <- A-B 
   #dual 
   vrsticeD <- nrow(dual)
   stolpciD <- ncol(dual)
   modmatD <- rbind(dual, rep(1, stolpciD))
-  d.con <- cbind(modmatD, c(rep(1, vrsticeD ), 0))
-  d.obj <- c(rep(0, stolpciD), 1)
+  d.con <- cbind(modmatD, c(rep(1, vrsticeD ), 0), c(rep(-1, vrsticeD ), 0))
+  d.obj <- c(rep(0, stolpciD), 1, -1)
   d.dir <- c(rep('>=', vrsticeD), '=')
   d.rhs <- c(rep(0, vrsticeD), 1)
   lin_prog_d <- lp ("min", d.obj, d.con, d.dir, d.rhs)
@@ -70,7 +57,7 @@ minmax_q <- function(A, B){
 
 }
 
-#enofazno pogajanje status quo je vedno tocka (0,0) --> TO NI PRAVA FORMULA!!
+#enofazno pogajanje status quo je vedno tocka (0,0) 
 enofazno_pogajanje <- function(A, B){
   SQ <- c(0, 0)
   Z <- A-B
@@ -89,9 +76,9 @@ enofazno_pogajanje <- function(A, B){
 
 dvofazno_pogajanje <- function(A, B){
   vek_q <- minmax_q(A,B)
-  q <- vek_q[1:length(vek_q)-1]
+  q <- vek_q[1:(length(vek_q)-2)]
   vek_p <- minmax_p(A,B)
-  p <- vek_p[1:length(vek_p)-1]
+  p <- vek_p[1:(length(vek_p)-2)]
   v_igre <- vek_p[length(vek_p)]
   tocka_groznje_1 <- t(p) %*% A %*% q
   tocka_groznje_2 <- t(p) %*% B %*% q
@@ -106,7 +93,7 @@ dvofazno_pogajanje <- function(A, B){
     tocka2 <- c(SQ[1]- SQ[2], 0)
   }
   sporazum <- line.line.intersection(c(0, g(0)), c(opt, g(opt)), c(SQ[1], SQ[2]), tocka2)
-  return(sporazum)
+  return(round(sporazum, 3))
   
 }
 
