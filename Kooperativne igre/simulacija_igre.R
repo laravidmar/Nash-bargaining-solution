@@ -68,7 +68,7 @@ enofazno_pogajanje <- function(A, B){
   f <- function(x) x
   g <- function(x) opt - x
   sporazum <- line.line.intersection(c(0, f(0)), c(xtop, f(xtop)), max_tocka, c( 0, opt))
-  return(round(sporazum,3))
+  return(round(sporazum,5))
 }
 
 
@@ -93,7 +93,7 @@ dvofazno_pogajanje <- function(A, B){
     tocka2 <- c(SQ[1]- SQ[2], 0)
   }
   sporazum <- line.line.intersection(c(0, g(0)), c(opt, g(opt)), c(SQ[1], SQ[2]), tocka2)
-  return(round(sporazum, 3))
+  return(round(sporazum, 5))
   
 }
 

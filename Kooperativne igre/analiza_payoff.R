@@ -19,7 +19,7 @@ povprecje_enofazna <- function(ponovitev, por1, por2, n, m){
     i <- i+ 1
     
   }
-  return(c(round(mean(vec_P1),3),round(mean(vec_P2),3)))
+  return(c(round(mean(vec_P1),5),round(mean(vec_P2),5)))
 }
 
 povprecje_dvofazne <- function(ponovitev, por1,por2, n, m){
@@ -33,7 +33,7 @@ povprecje_dvofazne <- function(ponovitev, por1,por2, n, m){
     i <- i+ 1
     
   }
-  return(round(c(mean(vec_P1),3), round(mean(vec_P2),3)))
+  return(c(round(mean(vec_P1),5), round(mean(vec_P2),5)))
 }
 
 
@@ -43,9 +43,9 @@ enofazna_enaka_por <- function(por1, por2, n, m){
   stevec <- 1
   i <- 2
   while (i <= n){
-    j <-2
+    j <- i 
     while (j <= m){
-      izracun <- povprecje_enofazna(50, por1, por2, n, m)
+      izracun <- povprecje_enofazna(50, por1, por2, i, j)
       payoff_matrika[stevec,] <- cbind(i * j,'igralec1', izracun[1])
       payoff_matrika[stevec + 1,] <- cbind(i * j, 'igralec2', izracun[2])
       
@@ -55,7 +55,9 @@ enofazna_enaka_por <- function(por1, por2, n, m){
     i <- i +1
   }
   colnames(payoff_matrika)<- c('velikost_matrike', 'igralec', 'Vrednost')
-  return(payoff_matrika)
+  num_transform <- transform(payoff_matrika, velikost_matrike = as.numeric(velikost_matrike))
+  mat_payoff <- arrange(num_transform, num_transform$velikost_matrike) %>% na.omit()
+  return(mat_payoff)
 }
 
 #več kot matrika 10x10 se v zgornji funkciji ne vidi nič več, zato bom naredila drugače za vecje matrike
@@ -63,7 +65,7 @@ enofazna_enaka_por_big_n <- function(por1, por2, n, m){
   payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-1) *(m-1), ncol = 3))
   stevec <- 1
   for (i in 2:n){
-    j <-2
+    j <-i
     while (j <= m){
       izracun <- povprecje_enofazna(50, por1, por2, i, j)
       payoff_matrika[stevec,] <- cbind(i*j, izracun[1], izracun[2])
@@ -72,7 +74,9 @@ enofazna_enaka_por_big_n <- function(por1, por2, n, m){
     }
   }
   colnames(payoff_matrika)<- c('velikost_matrike', 'igralec1', 'igralec2')
-  return(payoff_matrika)
+  num_transform <- transform(payoff_matrika, velikost_matrike = as.numeric(velikost_matrike))
+  mat_payoff <- arrange(num_transform, num_transform$velikost_matrike) %>% na.omit()
+  return(mat_payoff)
   
 }
 
@@ -82,9 +86,9 @@ dvofazna_enaka_por <- function(por1, por2, n, m){
   stevec <- 1
   i <- 2
   while (i <= n){
-    j <-2
+    j <-i
     while (j <= m){
-      izracun <-  dvofazno_pogajanje(matrika(por1, n,m), matrika(por2, n, m))
+      izracun <-  dvofazno_pogajanje(matrika(por1, i,j), matrika(por2, i, j))
       payoff_matrika[stevec,] <- cbind(i * j,'igralec1', izracun[1])
       payoff_matrika[stevec + 1,] <- cbind(i * j, 'igralec2', izracun[2])
       
@@ -94,25 +98,29 @@ dvofazna_enaka_por <- function(por1, por2, n, m){
     i <- i +1
   }
   colnames(payoff_matrika)<- c('velikost_matrike', 'igralec', 'Vrednost')
-  return(payoff_matrika)
+  num_transform <- transform(payoff_matrika, velikost_matrike = as.numeric(velikost_matrike))
+  mat_payoff <- arrange(num_transform, num_transform$velikost_matrike) %>% na.omit()
+  return(mat_payoff)
 }
 
 
 #dobimo matriko v kateri so payoffi obeh igralcev vse do velikosti n *m, glede na izbrani porazdelitvi, za dvofazno igro 
 dvofazna_enaka_por_big_n <- function(por1,por2, n, m){ 
-  payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-2) *(m-2), ncol = 3))
+  payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-1) *(m-1), ncol = 3))
   stevec <- 1
-  for (i in 3:n){
-    j <-3
+  for (i in 2:n){
+    j <-i
     while (j <= m){
-      izracun <- povprecje_dvofazne(50, por1, por2, n, m)
+      izracun <- povprecje_dvofazne(50, por1, por2, i, j)
       payoff_matrika[stevec,] <- cbind(i * j, izracun[1], izracun[2])
-      j <- j+1
       stevec <- stevec +1
+      j <- j+1
     }
   }
   colnames(payoff_matrika)<- c('velikost_matrike', 'igralec1', 'igralec2')
-  return(payoff_matrika)
+  num_transform <- transform(payoff_matrika, velikost_matrike = as.numeric(velikost_matrike))
+  mat_payoff <- arrange(num_transform, num_transform$velikost_matrike) %>% na.omit()
+  return(mat_payoff)
   
 }
 
@@ -165,64 +173,64 @@ izbrana_porazdelitev <- function(por1, por2, n, m){
   if (por1 == 'exp'){
     if (por2 == 'exp'){
       uvoz <- readRDS('../Kooperativne igre/Data/exp_exp_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'norm'){
       uvoz <- readRDS('../Kooperativne igre/Data/exp_norm_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'beta'){
       uvoz <- readRDS('../Kooperativne igre/Data/exp_beta_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'invgama'){
       uvoz <- readRDS('../Kooperativne igre/Data/exp_invgama_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }
   }
   
   else if (por1 == 'norm'){
     if (por2 == 'exp'){
       uvoz <- readRDS('../Kooperativne igre/Data/norm_exp_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'norm'){
       uvoz <- readRDS('../Kooperativne igre/Data/norm_norm_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'beta'){
       uvoz <- readRDS('../Kooperativne igre/Data/norm_beta_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'invgama'){
       uvoz <- readRDS('../Kooperativne igre/Data/norm_invgama_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }
   }
   
   else if (por1 == 'beta'){
     if (por2 == 'exp'){
       uvoz <- readRDS('../Kooperativne igre/Data/beta_exp_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'norm'){
       uvoz <- readRDS('../Kooperativne igre/Data/beta_norm_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'beta'){
       uvoz <- readRDS('../Kooperativne igre/Data/beta_beta_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'invgama'){
       uvoz <- readRDS('../Kooperativne igre/Data/beta_invgama_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }
   }
   
   else if (por1 == 'invgama'){
     if (por2 == 'exp'){
       uvoz <- readRDS('../Kooperativne igre/Data/invgama_exp_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'norm'){
       uvoz <- readRDS('../Kooperativne igre/Data/invgama_norm_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'beta'){
       uvoz <- readRDS('../Kooperativne igre/Data/invgama_beta_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'invgama'){
       uvoz <- readRDS('../Kooperativne igre/Data/invgama_invgama_2.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz,sum(seq(m-1, m-n-1)))
     }
   }
   return(dat)
@@ -234,64 +242,64 @@ izbrana_porazdelitev_1 <- function(por1, por2, n, m){
   if (por1 == 'exp'){
     if (por2 == 'exp'){
       uvoz <- readRDS('../Kooperativne igre/Data/exp_exp_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'norm'){
       uvoz <- readRDS('../Kooperativne igre/Data/exp_norm_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'beta'){
       uvoz <- readRDS('../Kooperativne igre/Data/exp_beta_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz,sum(seq(m-1, m-n-1)))
     }else if (por2 == 'invgama'){
       uvoz <- readRDS('../Kooperativne igre/Data/exp_invgama_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }
   }
   
   else if (por1 == 'norm'){
     if (por2 == 'exp'){
       uvoz <- readRDS('../Kooperativne igre/Data/norm_exp_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'norm'){
       uvoz <- readRDS('../Kooperativne igre/Data/norm_norm_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'beta'){
       uvoz <- readRDS('../Kooperativne igre/Data/norm_beta_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'invgama'){
       uvoz <- readRDS('../Kooperativne igre/Data/norm_invgama_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }
   }
   
   else if (por1 == 'beta'){
     if (por2 == 'exp'){
       uvoz <- readRDS('../Kooperativne igre/Data/beta_exp_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'norm'){
       uvoz <- readRDS('../Kooperativne igre/Data/beta_norm_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'beta'){
       uvoz <- readRDS('../Kooperativne igre/Data/beta_beta_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'invgama'){
       uvoz <- readRDS('../Kooperativne igre/Data/beta_invgama_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }
   }
   
   else if (por1 == 'invgama'){
     if (por2 == 'exp'){
       uvoz <- readRDS('../Kooperativne igre/Data/invgama_exp_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'norm'){
       uvoz <- readRDS('../Kooperativne igre/Data/invgama_norm_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }else if (por2 == 'beta'){
       uvoz <- readRDS('../Kooperativne igre/Data/invgama_beta_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz,sum(seq(m-1, m-n-1)))
     }else if (por2 == 'invgama'){
       uvoz <- readRDS('../Kooperativne igre/Data/invgama_invgama_1.RDS')
-      dat <- head(uvoz, (n-1) * (m-1))
+      dat <- head(uvoz, sum(seq(m-1, m-n-1)))
     }
   }
   return(dat)

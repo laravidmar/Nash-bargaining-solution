@@ -223,8 +223,8 @@ server <- function(input, output, session){
   output$plot1O <- renderText({
     dol <- length(input$por11)
     if (dol == 1 & ((input$n1 * input$m1) <= 90)){
-      'Kot je razvidno so izplačila prvega in drugega igralca enaka, neglede na velikost matrike. Spreminja pa se velikost le teh. Lahko bi rekli, da velikost
-      matrike ne vpliva na višino izplačila.'
+      'Kot je razvidno so izplačila prvega in drugega igralca enaka, neglede na velikost matrike. Spreminja pa se velikost le teh. Lahko bi rekli, da se velikost
+      izplačil linearno povečuje z številom akcij.'
     }else if(dol == 1 & ((input$n1 * input$m1) > 90)){
       'Za večje matrike so izplačila predstavljena v 3D grafu. Vrednosti se z večanjem število akcij povečujejo. Pri nekaterih porazdelitvah se to zgodi hitreje. '
       
@@ -309,12 +309,12 @@ server <- function(input, output, session){
       dol <- length(input$por22)
       if (dol == 1 & ((input$n2 * input$m2) <= 90)){
         'V tabeli so predstavljene vrednosti izplačil posameznega igralca glede na velikost matrike. Kot je razvidno so izplačila različna glede na 
-        igralca. Težko pa bi rekli, da vidimo kakšen vzorec.'
+        igralca. Težko pa bi rekli, da vidimo kakšen vzorec povezan z višino izplena in velikostjo matrik.'
       }else if(dol == 1 & ((input$n2 * input$m2) > 90)){
         'Za večje matrike so izplačila predstavljena v 3D grafu. Vrednosti so razpršene, vendar lahko vidimo naraščujoč trend.'
         
       }else if (dol >= 2){
-        paste('Prikazana so izplačila, kjer ima prvi igralec porazdelitev', input$por12, '. Porazdelitev drugega pa se spreminja. Opazimo lahko, da so razlike pri vrednostih glede na porazdelitev, kar je pričakovano.')
+        paste('Prikazana so izplačila, kjer ima prvi igralec porazdelitev', input$por12, '. Porazdelitev drugega pa se spreminja.')
       }
       
     })
