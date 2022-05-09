@@ -21,21 +21,22 @@ V teoriji iger je kooperativna igra oziroma Nasheva igra pogajanja, igra pri kat
 
 Lahko imamo  prenosljive dobrine in neprenosljive dobrine. Pri prenosljivih dobrinah so koristi igralcev med seboj neposredno primerljive in posledično lahko to koristnost igralci med seboj smiselno prenašajo. Dopustna množica je konveksna lupina ${(x - s,  y + s) \in S' : s \in \mathbf{R}}$, pri tem $s$ predstavlja stranska plačila. 
 
-Imamo enostopensko in dvostopensko igro pogajanja. Pri enostopenski izhajamo iz pogajalskega izgodišča $(0,0)$, imenovan tudi status quo. Medtem ko pri dvostopenski igri, je status quo določen na podlagi grozilnih strategij posameznega igralca. Grozilna strategija je maximin startegija igralca. Z njo maksimiziramo verjetnost minimalnega profita. Če imamo igro za dva igralca ima prvi igralec maximin strategijo, medtem ko drugi minimax strategijo (minimizira verjetnost maksimalne izgube). To so bimatrične igre, kjer so izplačila in akcije predstavljene s pomočjo matrike. Vrednost igre je enaka 0. 
+Imamo enostopensko in dvostopensko igro pogajanja. Pri enostopenski igri izhajamo iz pogajalskega izgodišča $(0,0)$, imenovan tudi status quo. Medtem ko pri dvostopenski igri, je status quo določen na podlagi grozilnih strategij posameznega igralca. Grozilna strategija je maximin strategija igralca. Z njo maksimiziramo verjetnost minimalnega profita. Če imamo igro za dva igralca ima prvi igralec maximin strategijo, medtem ko drugi minimax strategijo (minimizira verjetnost maksimalne izgube). To so bimatrične igre, kjer so izplačila in akcije predstavljene s pomočjo matrike. Vrednost igre je enaka 0. 
 
 ## Opis projekta 
 
-Gledala bom bimatrične kooperativne igre, torej igre za dva igralca. Prvi bo imel akcije podane v vrsticah matrike, drugi pa v stolpcih. Analizirala bom samo igre s prenosljivimi dobrinami. Kot vem sporazum take igre vedno obstaja. Izhajala bom iz strateške igre. Matriki A in B bosta vsebovali vrednosti izplačil igralca ena in dva. Vrednosti le teh bodo simulirane s pomočjo štirih porazdelitev in sicer 
+Gledala bom bimatrične kooperativne igre, torej igre za dva igralca. Prvi bo imel akcije podane v vrsticah matrike, drugi pa v stolpcih. Analizirala bom samo igre s prenosljivimi dobrinami. Kot vemo sporazum take igre vedno obstaja. Izhajala bom iz strateške igre. Matriki A in B bosta vsebovali vrednosti možnih pričakovanih izplenov igralca ena in dva. Vrednosti le teh bodo simulirane s pomočjo štirih porazdelitev in sicer 
 $$N(3, 0.7), \quad Beta(5,1), \quad Invgama(2, 0.5)\quad in \quad Exp(3).$$
 
-Prvo bom simulirala enostopensko pogajanje, to pomeni da bo status quo v točki (0,0). Nato pa še dvostopensko igro, kjer bo status quo predstavljal grozilne strategija igralca. Pri obeh igrah bo funcija vrnila izplačila igralcev v igri. 
+Prvo bom simulirala enostopensko pogajanje, to pomeni da bo status quo v točki (0,0). Nato pa še dvostopensko igro, kjer bo status quo predstavljal grozilne strategije igralca. Pri obeh igrah bo funcija vrnila izplačila igralcev v igri. 
 
 Analizirala bom izplačila posameznika v igri pri različnih porazdelitvah in glede na različno število akcij tj. velikost matrike. Celotna analiza bo predstavljena v aplikaciji. 
 
 
 ### Generiranje podatkov 
 
-V datoteki $simulacija\_igre.R$ je predstavljena igra pogajanja. Kot prvo sem definirala funkcijo $matrika$, ki sprejme eno od zgornjih štirih porazdelitev in velikost matrike, ter vrne matriko vrednosti. S pomočjo te so generirane vrednosti bimatrične igre, kot razlika elemente matrike A in B, torej (A-B). Funkciji $enofazno\_pogajanje$ in $dvofazno\_pogajanje$, ki ju vidimo spodaj, vrneta vrednosti v Nashevem modelu pogajanja. Obe funkciji sta generirani tako, da najde presečišče z premico pod kotom 45 stopinj, ki leži na konveksni lupini, ter pravokotno premico, ki gre skozi točko quo. Pri dvofazni igri je status quo, določen s pomočjo maximin strategije (funkciji $minmax\_p$ in $minmax\_q$). 
+V datoteki $simulacija\_igre.R$ je predstavljena igra pogajanja. Kot prvo sem definirala funkcijo $matrika$, ki sprejme eno od zgornjih štirih porazdelitev in velikost matrike, ter vrne matriko vrednosti. S pomočjo te so generirane vrednosti bimatrične igre, kot razlika elementov matrike A in B, torej (A-B). Funkciji $enofazno\_pogajanje$ in $dvofazno\_pogajanje$, ki ju vidimo spodaj, vrneta vrednosti v Nashevem modelu pogajanja. Obe funkciji sta generirani tako, da najdeta presečišče z premico pod kotom 45 stopinj, ki leži na konveksni lupini, ter pravokotno premico, ki gre skozi točko quo. Pri dvofazni igri je status quo, določen s pomočjo maximin strategije (funkciji $minmax\_p$ in $minmax\_q$). Take vrednosti sem poiskala s pomočjo linearnega programiranja in funkcij $lp$. Pri tem sem matriko A-B preoblikovala tako, da vsebuje vse pogoje, potrebne za reševanje. 
+
 
 ```{r , echo=FALSE ,warning=FALSE}
 library(hop)
@@ -147,7 +148,7 @@ dvofazno_pogajanje <- function(A, B){
 Analiza obeh iger je v datoteki $analiza\_payoff.R$. Velikost izplačil za posameznega igralca sem primerjala glede na dva parametra. In sicer glede na velikost matrike (število akcij), ter glede na različne zgoraj izbrane porazdelitve. 
 
 1. Kot prvo imam zapisane funkcije, ki vrnejo primerjavo izplačil glede na število akcij in fiksne porazdelitve igralcev. Pri tem sami določimo maksimalno velikost, graf pa nam pokaže izplačila vseh matrik do izbrane velikosti. 
-Za matrike manjše od 10x10, je to predstavljeno v grafu. Na primer, za dvofazno pogajanje za velikost matrike 5x7, prvi igralec igra s porazdelitvijo $N(3,0.7)$, drugi pa z $Beta(5,1).$ Pri tem je velikost matrik predstavljena kot produkt vrstic in stolpcev. Za boljšo primerjavo porazdelitev sem vzela povprečje 50-ih ponovitev igre. 
+Za matrike manjše od 10x10, je to predstavljeno v grafu. Spodaj imamo prikazan primer, za dvofazno pogajanje za velikost matrike 5x7, prvi igralec igra s porazdelitvijo $N(3,0.7)$, drugi pa z $Beta(5,1).$ Pri tem je velikost matrik predstavljena kot produkt vrstic in stolpcev. Za boljšo primerjavo porazdelitev sem vzela povprečje 50-ih ponovitev igre (funkciji $povprecje\_enofazna$ in $povprecje\_dvofazna$). 
 
 ```{r, echo=FALSE}
 povprecje_enofazna <- function(ponovitev, por1, por2, n, m){
@@ -175,17 +176,18 @@ povprecje_dvofazne <- function(ponovitev, por1,por2, n, m){
     i <- i+ 1
     
   }
-  return(round(c(mean(vec_P1),3), round(mean(vec_P2),3)))
+  return(c(round(mean(vec_P1),3), round(mean(vec_P2),3)))
 }
 
+#dobimo matriko v kateri so payoffi obeh igralcev vse do velikosti n *m, glede na izbrano porazdelitev za enofazno igro 
 enofazna_enaka_por <- function(por1, por2, n, m){ 
   payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-1) *(m - 1)*2, ncol = 3))
   stevec <- 1
   i <- 2
   while (i <= n){
-    j <-2
+    j <- i 
     while (j <= m){
-      izracun <- povprecje_enofazna(50, por1, por2, n, m)
+      izracun <- povprecje_enofazna(50, por1, por2, i, j)
       payoff_matrika[stevec,] <- cbind(i * j,'igralec1', izracun[1])
       payoff_matrika[stevec + 1,] <- cbind(i * j, 'igralec2', izracun[2])
       
@@ -195,19 +197,40 @@ enofazna_enaka_por <- function(por1, por2, n, m){
     i <- i +1
   }
   colnames(payoff_matrika)<- c('velikost_matrike', 'igralec', 'Vrednost')
-  return(payoff_matrika)
+  num_transform <- transform(payoff_matrika, velikost_matrike = as.numeric(velikost_matrike))
+  mat_payoff <- arrange(num_transform, num_transform$velikost_matrike) %>% na.omit()
+  return(mat_payoff)
 }
 
+#več kot matrika 10x10 se v zgornji funkciji ne vidi nič več, zato bom naredila drugače za vecje matrike
+enofazna_enaka_por_big_n <- function(por1, por2, n, m){ 
+  payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-1) *(m-1), ncol = 3))
+  stevec <- 1
+  for (i in 2:n){
+    j <-i
+    while (j <= m){
+      izracun <- povprecje_enofazna(50, por1, por2, i, j)
+      payoff_matrika[stevec,] <- cbind(i*j, izracun[1], izracun[2])
+      stevec <- stevec +1
+      j <- j+1
+    }
+  }
+  colnames(payoff_matrika)<- c('velikost_matrike', 'igralec1', 'igralec2')
+  num_transform <- transform(payoff_matrika, velikost_matrike = as.numeric(velikost_matrike))
+  mat_payoff <- arrange(num_transform, num_transform$velikost_matrike) %>% na.omit()
+  return(mat_payoff)
+  
+}
 
-
+#dvofazna za velikosti matrike do 10x10 
 dvofazna_enaka_por <- function(por1, por2, n, m){ 
   payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-1) *(m - 1)*2, ncol = 3))
   stevec <- 1
   i <- 2
   while (i <= n){
-    j <-2
+    j <-i
     while (j <= m){
-      izracun <-  dvofazno_pogajanje(matrika(por1, n,m), matrika(por2, n, m))
+      izracun <-  dvofazno_pogajanje(matrika(por1, i,j), matrika(por2, i, j))
       payoff_matrika[stevec,] <- cbind(i * j,'igralec1', izracun[1])
       payoff_matrika[stevec + 1,] <- cbind(i * j, 'igralec2', izracun[2])
       
@@ -217,8 +240,33 @@ dvofazna_enaka_por <- function(por1, por2, n, m){
     i <- i +1
   }
   colnames(payoff_matrika)<- c('velikost_matrike', 'igralec', 'Vrednost')
-  return(payoff_matrika)
+  num_transform <- transform(payoff_matrika, velikost_matrike = as.numeric(velikost_matrike))
+  mat_payoff <- arrange(num_transform, num_transform$velikost_matrike) %>% na.omit()
+  return(mat_payoff)
 }
+
+
+#dobimo matriko v kateri so payoffi obeh igralcev vse do velikosti n *m, glede na izbrani porazdelitvi, za dvofazno igro 
+dvofazna_enaka_por_big_n <- function(por1,por2, n, m){ 
+  payoff_matrika <- as.data.frame(matrix(NA, nrow =(n-1) *(m-1), ncol = 3))
+  stevec <- 1
+  for (i in 2:n){
+    j <-i
+    while (j <= m){
+      izracun <- povprecje_dvofazne(50, por1, por2, i, j)
+      payoff_matrika[stevec,] <- cbind(i * j, izracun[1], izracun[2])
+      stevec <- stevec +1
+      j <- j+1
+    }
+  }
+  colnames(payoff_matrika)<- c('velikost_matrike', 'igralec1', 'igralec2')
+  num_transform <- transform(payoff_matrika, velikost_matrike = as.numeric(velikost_matrike))
+  mat_payoff <- arrange(num_transform, num_transform$velikost_matrike) %>% na.omit()
+  return(mat_payoff)
+  
+}
+
+
 ```
 
 ```{r , echo=FALSE ,warning=FALSE}
@@ -236,11 +284,11 @@ ggplot(data = dat) +
 
 Za večje matrike pa je tak graf nepregleden, zato so za velike $n$ in $m$, izplačila predstavljena s pomočjo 3D grafa. Kjer so na oseh vrednosti izplačil prvega in drugega igralca ter velikost matrike. Spodaj je predstavljen primer za dvostopensko pogajane za velikost matrike 22x30 in s porazdelitvami $N(3,0.7)$ in $Beta(5,1).$ 
 
-![Dvofazno pogajanje 3D](3D_dvofazna_norm_beta.PNG)
+![Slika 1: Dvofazno pogajanje 3D](3D_dvofazna_norm_beta.PNG)
 
 Matrike so velike in za izračun bi bilo potrebno veliko časa, zato so padatki shranjeni v RDS datotekah. Funkciji, ki jih bereta, sta $izbrana\_porazdelitev$ in $izbrana\_porazdelitev\_1.$
 
-2. Druga predstavitev podatkov pa ima fiksno velikost matrik, spreminjajo pa se porazdelitve posameznega igralca.To je predstavljeno v histogramu. Prvi igralec ima pri tem neko fiksno porazdelitev, izplačila pa se primerjajo glede na različne porazdelitve drugega igralca. Na primer histogram za dvofazno igro pogajanja, pri velikosti matrike 7x10. Prvi igralec ima porazdelitev $N(3,0.7)$. 
+2. Druga predstavitev podatkov pa ima fiksno velikost matrik, spreminjajo pa se porazdelitve posameznega igralca. To je predstavljeno v histogramu. Prvi igralec ima pri tem neko fiksno porazdelitev, izplačila pa se primerjajo glede na različne porazdelitve drugega igralca. Na primer histogram za dvofazno igro pogajanja, pri velikosti matrike 7x10. Prvi igralec ima porazdelitev $N(3,0.7)$. 
 
 ```{r , echo=FALSE ,warning=FALSE}
 
@@ -294,7 +342,7 @@ dat <- dvofazna_vec_porazdelitev(por0='norm' ,por1 = 'norm', por2= 'beta', por3 
 
 ```
 
-3. Za lažjo predstavo implementacije sporazuma pa nam funkciji $graf\_enofazna$  in $graf\_dvofazna$ vrneta grafično implementacijo. Z rumeno je obarvana dopustna množica z prenosljive dobrine, to je konveksna lupina vseh možnih pričakovanih izplenov igralcev po stranskih plačilih. Modra premica je postavljena pod kotom 45° in poteka skozi točko, ki maksimizira pričakovani skupni izplen obeh igralcev. Z SQ je označen status quo. Pri enofaznem pogajanju je to (0,0), pri dvofaznem pa grozilni strategji. Črna premica tako poteka skozi točko SQ in seka modro premico pod kotom 90°. Presečišče je naša rešitev igre pogajanja, označena s NBS.
+3. Za lažjo predstavo implementacije sporazuma pa nam funkciji $graf\_enofazna$  in $graf\_dvofazna$ vrneta grafično implementacijo. Z rumeno je obarvana dopustna množica s prenosljivimi dobrinami, to je konveksna lupina vseh možnih pričakovanih izplenov igralcev po stranskih plačilih. Modra premica je postavljena pod kotom 45° in poteka skozi točko, ki maksimizira pričakovani skupni izplen obeh igralcev. Z SQ je označen status quo. Pri enostopenskem pogajanju je to (0,0), pri dvostopenskem pa grozilni strategiji. Črna premica tako poteka skozi točko SQ in seka modro premico pod kotom 90°. Presečišče je naša rešitev igre pogajanja, označena s NBS.
 
 ```{r , echo=FALSE ,warning=FALSE}
 graf_enofazna <- function(por1, por2, n, m){
@@ -376,21 +424,21 @@ graf_dvofazna('norm', 'beta', 5,4)
 
 ### Aplikacija App_NBS
 
-Vse zgornje predstavitve podatkov so predatvljene na enak način v aplikaciji. Pri tem lahko opazujemo velikost izplačil za matrike velikosti do 40x40. Posebaj izberemo število vrstic in stolpcev. Prav tako izberemo porazdelitev za prvega igralca, pri tem lahko izberemo samo eno možnost. Pri porazdelitvi za drugega igralca pa lahko izberemo več porazdelitev hkrati. Če izberemo samo eno tudi za drugega igralca, bo predstavljena analiza $1.$ iz zgornjega razdelka. V kolikor pa izberemo več kot eno porazdelitev pa bo prikazana analiza $2.$ Vsakič pa lahko vidimo tudi implementacijo sporazuma torej $3.$ 
+Vse zgornje predstavitve podatkov so predstavljene na enak način v aplikaciji. Pri tem lahko opazujemo velikost izplačil za matrike velikosti do 40x40. Posebaj izberemo število vrstic in stolpcev. Prav tako izberemo porazdelitev za prvega igralca, pri tem lahko izberemo samo eno možnost. Pri porazdelitvi za drugega igralca pa lahko izberemo več porazdelitev hkrati. Če izberemo samo eno tudi za drugega igralca, bo predstavljena analiza $1.$ iz zgornjega razdelka. V kolikor pa izberemo več kot eno porazdelitev pa bo prikazana analiza $2.$ Vsakič pa lahko vidimo tudi implementacijo sporazuma torej $3.$ V aplikaciji lahko vidimo podatke posebaj za enostopensko in dvostopensko igro pogajanja. 
 
-![Možnosti izbire v aplikaciji](app_2stran.PNG){width=30%}
+![Slika 2: Možnosti izbire v aplikaciji](app_2stran.PNG){width=30%}
 
 ### Možne izboljšave
-* Primerjati izplačila glede na velikost v smislu ali je razlika če gledamo npr. 4x10 ali 10x4
-* Pri porazdelitvah bi bilo smiselno narediti primerjavo tuki ko spreminjamo vrednost parametrov v posamezni porazdelitvi. 
+* Primerjati izplačila glede na velikost v smislu ali je razlika če gledamo npr. 4x10 ali 10x4 velike matrike. 
+* Pri porazdelitvah bi bilo smiselno narediti primerjavo tuki ko spreminjamo vrednost parametrov v posamezni porazdelitvi. Na primer, ali obstaja povezava med višanjem variance in izplenom igralcev pri normalni porazdelitvi. 
 
 ## Analiza
 
 ### Enostopensko pogajanje 
+ 
+Prvo bomo gledali ali velikost matrike vpliva na višino izplačil posameznega igralca 
 
-Ker začnemo vedno v isti točki tj. (0,0), bodo izplačila igralcev vedno enaka, neglede na število akcij ali porazdelitev. Zato lahko primerjamo zgolj velikost le teh. 
-
-Spodaj so predstavleni grafi velikosti izplačil, če ima prvi normalno porazdelitev. 
+Spodaj so predstavljeni grafi, kjer ima prvi igralec normalno porazdelitev. Vidimo lahko izplen igralcev, za matike do velikosti 5x7. Torej imamo velikosti 2x2, 2x3, 2x4, ..., 5x5, 5x6, 5x7.  
 
 ```{r , echo=FALSE ,warning=FALSE}
 dat <- enofazna_enaka_por('norm', 'beta', 5, 7)
@@ -433,14 +481,17 @@ ni1 <- ggplot(data = dat4) +
     labs(x = "Velikost matrike (n x m)")+
     ggtitle("N(3, 0.7) in Invgama(2, 0.5)")
 
-ggarrange(nb1, nn1, ne1, ni1 + rremove("x.text"), 
-          labels = c("A", "B", "C", 'D'),
+ggarrange(nb1, nn1, ne1, ni1 , 
+          labels = c("A1", "B1", "C1", 'D1'),
           ncol = 2, nrow = 2)
 ```
- 
+
+Kot prvo lahko iz grafov vidimo, da imata oba igralca enako visok izplen. To je pričakovano, saj vedno začnemo iz točke (0,0) in gledamo pravokotnico na premico s naklonom 45°. Vidimo lahko vzorec, ki povezuje velikost matrike. Torej večja kot je matrika, večji je izplen igralcev. Opazimo lahko tudi, da so vrednosti najvišje, če drugi igralec igra z normalno porazdelitvijo. Najnižje pa če igra z beta ali eksponentno.
+
+Poglejmo še primer, ko prvi igra s eksponentno porazdelitvijo.
 
 ```{r , echo=FALSE ,warning=FALSE}
-dat5 <- enofazna_enaka_por('exp', 'beta', 7,5)
+dat5 <- enofazna_enaka_por('exp', 'beta', 5, 7)
 nb2 <- ggplot(data = dat5) +
     geom_point(aes(x = velikost_matrike, y = Vrednost, 
                   color = igralec ), cex = 2, 
@@ -450,7 +501,7 @@ nb2 <- ggplot(data = dat5) +
     labs(x = "Velikost matrike (n x m)")+
     ggtitle("Exp(3) in Beta(5,1) ")
 
-dat6 <- enofazna_enaka_por('exp', 'norm',7,5)
+dat6 <- enofazna_enaka_por('exp', 'norm',5, 7)
 nn2 <- ggplot(data = dat6) +
     geom_point(aes(x = velikost_matrike, y = Vrednost, 
                   color = igralec ), cex = 2, 
@@ -460,7 +511,7 @@ nn2 <- ggplot(data = dat6) +
     labs(x = "Velikost matrike (n x m)")+
     ggtitle("Exp(3) in N(3, 0.7)")
 
-dat7 <- enofazna_enaka_por('exp', 'exp', 7,5)
+dat7 <- enofazna_enaka_por('exp', 'exp', 5, 7)
 ne2 <- ggplot(data = dat7) +
     geom_point(aes(x = velikost_matrike, y = Vrednost, 
                   color = igralec ), cex = 2, 
@@ -470,7 +521,7 @@ ne2 <- ggplot(data = dat7) +
     labs(x = "Velikost matrike (n x m)")+
     ggtitle("Exp(3) in Exp(3) ")
 
-dat8 <- enofazna_enaka_por('exp', 'invgama', 7,5)
+dat8 <- enofazna_enaka_por('exp', 'invgama', 5, 7)
 ni2 <- ggplot(data = dat8) +
     geom_point(aes(x = velikost_matrike, y = Vrednost, 
                   color = igralec ), cex = 2, 
@@ -480,13 +531,14 @@ ni2 <- ggplot(data = dat8) +
     labs(x = "Velikost matrike (n x m)")+
     ggtitle("Exp(3) in Invgama(2, 0.5)")
 
-ggarrange(nb2, nn2, ne2, ni2 + rremove("x.text"), 
-          labels = c("A", "B", "C", 'D'),
+ggarrange(nb2, nn2, ne2, ni2, 
+          labels = c("A2 ", "B2", "C2", 'D2'),
           ncol = 2, nrow = 2)
 ```
 
+Vidimo, da so vrednosti obeh igralcev zopet enake. Vendar se v tem primeru drugemu igralcu najbolj splača igrati z normalno porazdelitvijo. Če primerjamo graf C1 od zgoraj in B2, kjer igralca igrata z istimi porazdelitvami, opazimo da so vrednosti podobe. Menjava porazdelitev igralcev ne vpliva na izplačila. Če bi gledali ostale kombinacije porazdelitev, bi prišli do istih ugotovitev.  
 
-Kot smo že ugotovili zgoraj, velikost matrike skoraj da ne vpliva na izplačila. Zato pri naslednejm pregledu vzamemo nakljčno velike matrike. 
+Ugotovili smo, da velikost matrike vpliva na izplen igralcev. Lahko bi rekli, da se linearno povečuje, zato bomo vzeli naključno velike matrike. Izbrala sem 5x10. Sedaj primerjamo zgolj porazdelitve med sabo.
 
 ```{r , echo=FALSE ,warning=FALSE}
 datn1 <- enofazna_vec_porazdelitev('norm', 'norm', 'beta', 'invgama', 'exp', 5,10)
@@ -527,9 +579,19 @@ ggarrange(n1, b1, e1, i1,
 
 ```
 
-V zgornjih histogramih je predstavljena primerjava glede na različne porazdleitve. Prvi igralec igra s porazdelitvijo kot je napisana v naslovu histograma. Igralca dobita največji izplen če igra prvi eksponentno, drugi pa z inverzno gamo. Vidimo da igranje z beta porazdelitvijo ne prinese velik izkupiček. 
+V zgornjih histogramih je predstavljena primerjava glede na različne porazdelitve. Prvi igralec igra s porazdelitvijo kot je napisana v naslovu histograma. Igralca dobita največji izplen če oba igrata normalno porazdelitev. Vidimo da igranje z beta in eksponentno porazdelitvijo ne prinese velik izkupiček. 
+
+Za večje matrike gledamo 3D grafe. Vzela sem matrike velikosti 26x30. Oglejmo si grafe, kjer ima prvi porazdelitev inverzno gamo. Po vrsti pa si potem sledijo porazdelitve drugega igralca, kot beta, normalna, eksponentna in inverzna gama. 
+
+![Slika 3: Invgama in beta](invgaam_beta_13D.PNG){width=40%}   ![Slika 4: Invgama in normalna porazdelitev](invgaam_norm_13D.PNG){width=40%}
+![Slika 5: Invgama in eksponentna porazdelitev](invgaam_exp_13D.PNG){width=40%} ![Slika 6: Invgama in invgama porazdelitev](invgaam_invgama_13D.PNG){width=40%}
+
+Kot lahko vidimo so rezultati podobni kot pri manjših matrikah. Višina Izplačil igralcev je enaka. Razpršenost vrednosti pa se z večanjem matrik povečuje.
+
 
 ## Dvostopensko pogajanje
+
+Pri tem igralca grozita s svojimi minimax oz. maximin stategijami. Ker je točka vsebovana v konveksni lupini vseh možnih izplenov igralcev, pričakujemo različna končna izplačila. 
 
 ```{r , echo=FALSE ,warning=FALSE}
 dat2nb <- dvofazna_enaka_por('norm', 'beta', 5,7)
@@ -574,15 +636,15 @@ dni2 <- ggplot(data = dat2ni) +
     labs(x = "Velikost matrike (n x m)")+
     ggtitle("N(3, 0.7) in Invgama(2, 0.5)")
 
-ggarrange(dnb2, dnn2, dne2, dni2 + rremove("x.text"), 
-          labels = c("A", "B", "C", 'D'),
+ggarrange(dnb2, dnn2, dne2, dni2, 
+          labels = c("A1", "B1", "C1", 'D1'),
           ncol = 2, nrow = 2)
 
 ```
 
+Na grafih je razvidno, da se izplačila igralca ena in dva razlikujejo. Opazimo lahko, da ima prvi igralec v vsakem primeru višje končno izplačilo kot pa drugi, neglede na porazdelitev in velikost matrike. Drugi igralec pa ima najvišja izplačila, če igra z normalno porazdelitvijo (graf B1) in najmanjša če igra inverzno gama (graf D1). 
 
-Opazimo lahko da ima prvi igralec v vsakem primeru višje končno izplačilo kot pa drugi, neglede na porazdelitev in velikost matirke. Drugi igralec pa ima najvišja izplačila, če igra z normalno porazdelitvijo (graf B) in najmanjša če igra inverzno gama (graf D). 
-
+Poglejmo še primer, ko prvi igra s inverzno gama porazdelitvijo.
 
 ```{r , echo=FALSE ,warning=FALSE}
 dat2ib <- dvofazna_enaka_por('invgama', 'beta', 5,7)
@@ -627,11 +689,15 @@ dii2 <- ggplot(data = dat2ii) +
     labs(x = "Velikost matrike (n x m)")+
     ggtitle("Invgama(2, 0.5) in Invgama(2, 0.5)")
 
-ggarrange(dib2, din2, die2, dii2 + rremove("x.text"), 
-          labels = c("A", "B", "C", 'D'),
+ggarrange(dib2, din2, die2, dii2 , 
+          labels = c("A2", "B2", "C2", 'D2'),
           ncol = 2, nrow = 2)
 
 ```
+
+Vrednost izplena za posameznega igralca je v tem primeru bolj enakovredno. Izkupički so bližje skupaj. Če dobro pogledamo lahko vidimo, da pri grafu C2 in D2 je vedno na boljšem prvi igralec, medtem ko pri A2 in B2 ima višja izplačila prvi igralec. Pri grafoma D1 iz zgoraj in B2 pa vidimo ravno nasprotno sliko. Torej če igralca zamenjata porazdelitve, s tem zamenjata tudi izplačila, kar je pravilno. 
+
+Razlika od enostopenskega pogajanja je, da tukaj ni opazne povezave med število akcij in višino izplačil. Naslednje bomo primerjali porazdelitve med seboj. Vzela sem matrike velikosti 10x15. 
 
 ```{r , echo=FALSE ,warning=FALSE}
 datn2 <- dvofazna_vec_porazdelitev(por0='norm' ,por1 = 'norm', por2= 'beta', por3 = 'invgama', por4 = 'exp', 10, 15 )
@@ -673,8 +739,21 @@ ggarrange(n2, b2, e2, i2,
 
 ```
 
+Vidimo, da se igralcema najbolj splača igrati normalno in inverzno gamo. Vendar je večja razlika pri izplačilih, če igralca zamenjata porazdelitev, kot pri zgornji analizi. 
+
+
+Za večje matrike sem gledala 3D graf. Matrike so velikosti 26x30. Spodaj vidimo primer, kjer prvi igra normalno porazdelitev. Porazdelitve drugega igralca pa si po vrsti sledijo, kot beta, normalna, eksponentna in inverzna gama.
+
+ ![Slika 7: Normalna in beta](norm_beta_23D.PNG){width=40%} ![Slika 8: Normalna in normalna porazdelitev](norm_norm_23D.PNG){width=40%}
+![Slika 9: Normalna in eksponentna porazdelitev](norm_exp_23D.PNG){width=40%} ![Slika 10: Normalna in invgama porazdelitev](norm_invgama_23D.PNG){width=40%}
+
+Vidimo, da se pri velikih matrikah izplačila zmanjšajo, največji padec vidimo pri beti in normalni porazdelitvi drugega igralca. 
+
 
 ## Zaključek 
 
-## Literatura
+Cilj je bil, da analiziram višino izplačil glede na različne porazdelitve. Mislim, da mi je do neke mere uspelo ugotoviti podobnosti in vzorce, ki povezujejo porazdelitve. Velika razlika v rezultatih je, če primerjamo enostopensko in dvostopensko igro. Pri enostopenski smo ugotovili, da velikost matrike vpliva na višino izplačil in da je za igralca najbolje, da vsaj en igra z normalno porazdelitvijo (N(3,0.7)). Medtem ko pri dvostopenski povezava med številom akcij in izkupičkom ni nazorno vidna. Lahko bi rekli, da bosta imela najvišjo vrednost izplena, če bo vsaj en igral inverzno gamo. Videli smo tudi, da v kolikor si igralca zamenjata porazdelitvi se prav tako zamenja višina izplačil. Seveda, pa je glavna razlika v obeh igrah pogajanja ta, da imata pri enostopenski igri igralca isto višino izplačil.
 
+## Literatura
+* Zapiski iz Teorije iger
+* Wikipedia. (2021). Cooperative bargaining. Pridobljeno s https://en.wikipedia.org/wiki/Cooperative_bargaining
